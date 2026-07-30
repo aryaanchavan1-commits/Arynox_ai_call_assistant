@@ -66,7 +66,7 @@ Architecture: amd64
 Section: comm
 Priority: optional
 Maintainer: Sidin Search <sidinsearch.inbox@gmail.com>
-Homepage: https://github.com/sidinsearch/AgentCall-AGPL
+Homepage: https://github.com/sidinsearch/AgentCall
 Depends: libgtk-3-0, libnss3, libasound2, nodejs (>= 20), python3, android-tools-adb, ffmpeg
 Recommends: libappindicator3-1
 Provides: agentcall-gatewayd (= $version)

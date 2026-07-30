@@ -5,14 +5,14 @@
   <p>Turn a rooted Android phone into a secure voice endpoint for Hermes, OpenClaw, and human desktop operators.</p>
 
   <p>
-    <a href="https://github.com/sidinsearch/AgentCall-AGPL/actions/workflows/verify.yml"><img src="https://github.com/sidinsearch/AgentCall-AGPL/actions/workflows/verify.yml/badge.svg?branch=main" alt="Verify status"></a>
-    <a href="https://github.com/sidinsearch/AgentCall-AGPL/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/release-v1.0.0-00A896.svg" alt="AgentCall v1.0.0"></a>
+    <a href="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml"><img src="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml/badge.svg?branch=main" alt="Verify status"></a>
+    <a href="https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/release-v1.0.0-00A896.svg" alt="AgentCall v1.0.0"></a>
     <a href="docs/RELEASE_STATUS.md"><img src="https://img.shields.io/badge/status-hardware--qualified_RC-F59E0B.svg" alt="Hardware-qualified release candidate"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--only-2563EB.svg" alt="GNU AGPL v3.0 only"></a>
   </p>
 
   <p>
-    <a href="https://github.com/sidinsearch/AgentCall-AGPL/releases/latest"><strong>Download</strong></a>
+    <a href="https://github.com/sidinsearch/AgentCall/releases/latest"><strong>Download</strong></a>
     · <a href="docs/INSTALL.md"><strong>Installation</strong></a>
     · <a href="docs/ARCHITECTURE.md"><strong>Architecture</strong></a>
     · <a href="docs/MCP.md"><strong>MCP guide</strong></a>
@@ -84,7 +84,7 @@ audio is enabled.
 ## Quick start
 
 1. Download the desktop package and **one** Android installation artifact from
-   [AgentCall Releases](https://github.com/sidinsearch/AgentCall-AGPL/releases).
+   [AgentCall Releases](https://github.com/sidinsearch/AgentCall/releases).
 2. Verify the downloaded files against `SHA256SUMS`.
 3. Install either the standalone APK or the matched Magisk module—never both.
 4. Select AgentCall as Android's default Phone application.
@@ -177,7 +177,7 @@ lossless PNG from the [`screenshots/`](screenshots/README.md) directory.
 ## Release downloads
 
 Download the current files from
-[AgentCall v1.0.0](https://github.com/sidinsearch/AgentCall-AGPL/releases/tag/v1.0.0).
+[AgentCall v1.0.0](https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.0).
 
 | Asset | Use |
 |---|---|
@@ -397,8 +397,8 @@ Android SDK, ADB, and FFmpeg.
 Clone and run the canonical verifier on Linux:
 
 ```bash
-git clone https://github.com/sidinsearch/AgentCall-AGPL.git
-cd AgentCall-AGPL
+git clone https://github.com/sidinsearch/AgentCall.git
+cd AgentCall
 ./verify.sh
 ```
 

@@ -31,7 +31,7 @@ The all-in-one desktop Debian package includes the UI, gatewayd, MCP launcher, s
 
 Download assets from:
 
-https://github.com/sidinsearch/AgentCall-AGPL/releases
+https://github.com/sidinsearch/AgentCall/releases
 
 Download the assets for your platform:
 

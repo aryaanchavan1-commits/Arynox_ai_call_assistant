@@ -29,7 +29,7 @@ const ROUTES = Object.freeze([
   ['Policy', 'CommandOrControl+8', 'policy'],
   ['Settings', 'CommandOrControl+,', 'settings'],
 ]);
-const PROJECT_URL = 'https://github.com/sidinsearch/AgentCall-AGPL';
+const PROJECT_URL = 'https://github.com/sidinsearch/AgentCall';
 
 export function buildApplicationMenu(navigate) {
   return [

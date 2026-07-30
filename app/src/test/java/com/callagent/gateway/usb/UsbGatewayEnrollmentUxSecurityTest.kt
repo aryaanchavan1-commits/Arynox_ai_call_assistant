@@ -24,7 +24,7 @@ class UsbGatewayEnrollmentUxSecurityTest {
         assertTrue(activity.contains("ControllerEnrollmentStore(AndroidControllerSecretStorage(this))"))
         assertTrue(activity.contains("showForgetConfirmation"))
         assertTrue(activity.contains("Intent.ACTION_VIEW"))
-        assertTrue(activity.contains("https://github.com/sidinsearch/AgentCall-AGPL"))
+        assertTrue(activity.contains("https://github.com/sidinsearch/AgentCall"))
         assertTrue(activity.contains("enrollmentStore().revoke()"))
         assertTrue(manifest.contains("android:name=\".usb.UsbGatewayActivity\""))
         assertTrue(manifest.contains("android:exported=\"false\""))

@@ -7,7 +7,7 @@ and Debian artifacts from the same source revision.
 ## Highlights
 
 - Canonical project ownership and in-app links now use
-  `sidinsearch/AgentCall-AGPL`.
+  `sidinsearch/AgentCall`.
 - The GitHub README now includes a complete Full HD desktop gallery and native
   1080 × 2400 Android captures.
 - Calls, contacts, and recent-call screenshots use fictional identities and

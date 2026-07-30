@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Secure daemon-backed Electron operations client for the USB-only AgentCall cellular agent gateway.",
-  "homepage": "https://github.com/sidinsearch/AgentCall-AGPL",
+  "homepage": "https://github.com/sidinsearch/AgentCall",
   "author": {
     "name": "Sidin Search",
     "email": "sidinsearch.inbox@gmail.com"

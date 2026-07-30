@@ -196,6 +196,6 @@ class UsbGatewayActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val PROJECT_URL = "https://github.com/sidinsearch/AgentCall-AGPL"
+        const val PROJECT_URL = "https://github.com/sidinsearch/AgentCall"
     }
 }

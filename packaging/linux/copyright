@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: AgentCall
-Source: https://github.com/sidinsearch/AgentCall-AGPL
+Source: https://github.com/sidinsearch/AgentCall
 
 Files: *
 Copyright: 2026 Sidin Search and AgentCall contributors

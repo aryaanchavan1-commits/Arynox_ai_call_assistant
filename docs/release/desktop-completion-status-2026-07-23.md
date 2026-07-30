@@ -30,7 +30,7 @@ The source is now a Windows/Android release candidate, not a production-signed p
 
 ## Source and publication state
 
-- Repository: [`sidinsearch/AgentCall-AGPL`](https://github.com/sidinsearch/AgentCall-AGPL)
+- Repository: [`sidinsearch/AgentCall`](https://github.com/sidinsearch/AgentCall)
 - Branch: `wt/desktop-complete-v1`
 - Integrated code commit: `5383308` (`feat: complete zero-touch desktop gateway integration`)
 - Pull request: not created
