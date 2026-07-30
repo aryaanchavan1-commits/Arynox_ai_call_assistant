@@ -1,8 +1,8 @@
 # AgentCall 1.0.0
 
-AgentCall 1.0.0 is the first hardware-qualified release for the
-hardware-qualified AgentCall stack. It ships matched Android, Magisk, Windows,
-and Debian artifacts from the same source revision.
+AgentCall 1.0.0 is the first unified release of the hardware-qualified
+AgentCall stack. It ships matched Android, Magisk, Windows, and Debian
+artifacts from one source revision.
 
 ## Highlights
 
@@ -33,9 +33,9 @@ selection, USB pairing, provider setup, and Hermes/OpenClaw MCP configuration.
 
 ## Qualification and signing
 
-The functional runtime remains the physically qualified AgentCall 0.2.4
+The functional runtime retains the physically qualified cellular media
 architecture. AgentCall 1.0.0 updates project identity, packaging metadata, and
-documentation without changing the cellular media path.
+documentation without changing that call path.
 
 The distributed Android APK uses the qualification signing identity. The
 Windows installer is not Authenticode signed, and the Debian package is not
