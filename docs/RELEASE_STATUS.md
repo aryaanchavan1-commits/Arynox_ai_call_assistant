@@ -1,10 +1,10 @@
 # AgentCall release status
 
-Updated: 2026-07-29
+Updated: 2026-07-30
 
 ## Classification
 
-**Hardware-qualified release candidate**
+**Hardware-qualified v1.0.0 release**
 
 - Desktop version: `1.0.0`
 - Android version: `1.0.0 (332)`
@@ -24,7 +24,7 @@ app-store, Authenticode, or signed-repository artifacts.
 
 ### Automated
 
-- Gateway and MCP: 440 tests pass on Linux with 0 failures; 435 pass and 5
+- Gateway and MCP: 441 tests pass on Linux with 0 failures; 436 pass and 5
   platform-specific skips on Windows.
 - Desktop: 108 tests and syntax checks pass on Windows and Linux.
 - Android: unit tests, lint, manifest binding, and debug APK assembly are part
@@ -111,7 +111,7 @@ Every GitHub Release must:
 
 1. point at one immutable `main` commit;
 2. include Windows, Debian, APK, and matched Magisk artifacts;
-3. include `SHA256SUMS`, Android artifact status, and rollback evidence;
+3. validate and publish the SHA-256 digest of every downloadable artifact;
 4. state the signing/classification honestly;
 5. prove the Magisk-embedded APK is byte-identical to the standalone APK;
 6. contain no provider keys, ADB keys, controller credentials, contacts,
