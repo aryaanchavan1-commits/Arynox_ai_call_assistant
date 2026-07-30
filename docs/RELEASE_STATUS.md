@@ -6,8 +6,8 @@ Updated: 2026-07-29
 
 **Hardware-qualified release candidate**
 
-- Desktop version: `0.2.5`
-- Android version: `2.8.54 (332)`
+- Desktop version: `1.0.0`
+- Android version: `1.0.0 (332)`
 - Reference phone: Xiaomi POCO M2 Pro (`gram`, Qualcomm `atoll`)
 - Reference Android: tested Android 15 / API 35 build, Magisk 30.7,
   SELinux Enforcing

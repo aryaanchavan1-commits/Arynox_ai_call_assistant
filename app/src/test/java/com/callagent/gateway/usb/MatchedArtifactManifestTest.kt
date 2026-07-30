@@ -19,7 +19,7 @@ class MatchedArtifactManifestTest {
         val manifest = MatchedArtifactManifest.parse(canonical)
         assertEquals(1, manifest.schemaVersion)
         assertEquals(1, manifest.bootstrapProtocolVersion)
-        assertEquals("0.2.5", manifest.desktopPackageVersion)
+        assertEquals("1.0.0", manifest.desktopPackageVersion)
         assertEquals("com.callagent.gateway", manifest.androidPackageName)
         assertEquals(332L, manifest.androidVersionCode)
         assertEquals(32, manifest.androidSigningCertificateSha256.size)
@@ -41,7 +41,7 @@ class MatchedArtifactManifestTest {
             canonical.toString(Charsets.US_ASCII).replace("schemaVersion=1\n", "").toByteArray(),
             canonical.toString(Charsets.US_ASCII).replace("androidVersionCode=332", "androidVersionCode=0332").toByteArray(),
             canonical.toString(Charsets.US_ASCII).replace("androidVersionCode=332", "androidVersionCode=999999999999999999999999").toByteArray(),
-            canonical.toString(Charsets.US_ASCII).replace("desktopPackageVersion=0.2.5", "desktopPackageVersion=00.2.5").toByteArray(),
+            canonical.toString(Charsets.US_ASCII).replace("desktopPackageVersion=1.0.0", "desktopPackageVersion=01.0.0").toByteArray(),
             canonical.toString(Charsets.US_ASCII).replace(Regex("androidSigningCertificateSha256=[0-9a-f]{64}"), "androidSigningCertificateSha256=${"0".repeat(64)}").toByteArray(),
         ).forEach { bytes ->
             assertTrue(runCatching { MatchedArtifactManifest.parse(bytes) }.isFailure)

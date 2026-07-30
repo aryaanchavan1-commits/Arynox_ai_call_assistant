@@ -24,7 +24,7 @@ test('Node and package inputs consume exact canonical device-neutral manifest by
     });
     assert.equal(loaded.manifest.schemaVersion, 1);
     assert.equal(loaded.manifest.bootstrapProtocolVersion, 1);
-    assert.equal(loaded.manifest.desktopPackageVersion, '0.2.5');
+    assert.equal(loaded.manifest.desktopPackageVersion, '1.0.0');
     assert.equal(loaded.manifest.androidPackageName, 'com.callagent.gateway');
     assert.equal(loaded.manifest.androidVersionCode, 332);
     assert.equal(loaded.manifest.androidSigningCertificateSha256.length, 64);
@@ -77,6 +77,6 @@ test('manifest parser rejects unknown duplicate missing private and self-digest 
   assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('schemaVersion=1\n', ''))));
   assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('androidVersionCode=332', 'androidVersionCode=0332'))));
   assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('androidVersionCode=332', 'androidVersionCode=999999999999999999999999'))));
-  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('desktopPackageVersion=0.2.5', 'desktopPackageVersion=00.2.5'))));
+  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('desktopPackageVersion=1.0.0', 'desktopPackageVersion=01.0.0'))));
   assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace(/androidSigningCertificateSha256=[0-9a-f]{64}/, `androidSigningCertificateSha256=${'0'.repeat(64)}`))));
 });

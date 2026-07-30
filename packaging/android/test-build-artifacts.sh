@@ -9,7 +9,7 @@ printf 'fixture-apk' > "$fixture"
 mkdir -p "$tmp/bin"
 cat > "$tmp/bin/aapt" <<'EOF'
 #!/bin/sh
-printf "package: name='com.callagent.gateway' versionCode='332' versionName='2.8.54' platformBuildVersionName=''\n"
+printf "package: name='com.callagent.gateway' versionCode='332' versionName='1.0.0' platformBuildVersionName=''\n"
 EOF
 chmod 0755 "$tmp/bin/aapt"
 
@@ -26,11 +26,11 @@ grep -F 'APK version mismatch' "$tmp/version-mismatch.err" >/dev/null
 PATH="$tmp/bin:$PATH" "$root/packaging/android/build-artifacts.sh" \
   --apk "$fixture" \
   --output "$tmp/out" \
-  --version-name 2.8.54 \
+  --version-name 1.0.0 \
   --version-code 332
 
-apk="$tmp/out/AgentCall-2.8.54-332.apk"
-module="$tmp/out/AgentCall-privileged-2.8.54-332-magisk.zip"
+apk="$tmp/out/AgentCall-1.0.0-332.apk"
+module="$tmp/out/AgentCall-privileged-1.0.0-332-magisk.zip"
 test -f "$apk"
 test -f "$module"
 cmp -s "$fixture" "$apk"
@@ -38,7 +38,7 @@ unzip -t "$module" >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'id=agentcall-privileged' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'name=AgentCall Privileged Telephony Bridge' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'author=Sidin Search' >/dev/null
-unzip -p "$module" module.prop | grep -Fx 'version=2.8.54' >/dev/null
+unzip -p "$module" module.prop | grep -Fx 'version=1.0.0' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'versionCode=332' >/dev/null
 unzip -p "$module" META-INF/com/google/android/update-binary > "$tmp/update-binary"
 grep -F 'install_module || exit $?' "$tmp/update-binary" >/dev/null
@@ -114,13 +114,13 @@ fi
 grep -F 'QUALIFICATION_ONLY_DEBUG_SIGNED' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F 'Publishable: NO' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F 'Parsed APK package: com.callagent.gateway' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
-grep -F 'Parsed APK version: 2.8.54 (332)' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
+grep -F 'Parsed APK version: 1.0.0 (332)' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F "Standalone APK SHA-256: $(sha256sum "$apk" | cut -d' ' -f1)" "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F 'Standalone/embedded APK byte equality: VERIFIED' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 
 test -f "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt"
 grep -F 'Current package: com.callagent.gateway' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
-grep -F 'Current version: 2.8.54 (332)' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
+grep -F 'Current version: 1.0.0 (332)' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
 grep -F 'Downgrade policy: REFUSE_IN_PLACE_DOWNGRADE' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
 grep -F 'Rollback requires: remove module, reboot, verify package absence, then install a separately verified prior matched artifact' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
 grep -F 'Device rollback qualification: NOT_RUN_APPROVAL_REQUIRED' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
@@ -128,11 +128,11 @@ grep -F 'Device rollback qualification: NOT_RUN_APPROVAL_REQUIRED' "$tmp/out/AND
 PATH="$tmp/bin:$PATH" "$root/packaging/android/build-artifacts.sh" \
   --apk "$fixture" \
   --output "$tmp/out-second" \
-  --version-name 2.8.54 \
+  --version-name 1.0.0 \
   --version-code 332 >/dev/null
 for artifact in \
-  AgentCall-2.8.54-332.apk \
-  AgentCall-privileged-2.8.54-332-magisk.zip \
+  AgentCall-1.0.0-332.apk \
+  AgentCall-privileged-1.0.0-332-magisk.zip \
   ARTIFACT-STATUS.txt \
   ANDROID-ROLLBACK-MANIFEST.txt \
   SHA256SUMS; do

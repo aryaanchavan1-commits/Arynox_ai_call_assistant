@@ -94,7 +94,9 @@ export class Gateway extends EventEmitter {
     this.activeRecordingCallId = null;
     this.activeRealtime = null;
     this.recordingTeardownPending = false;
-    this.realtimeHealth = { healthy: false, reason: 'realtime not initialized' };
+    this.realtimeHealth = this.createRealtimeSession
+      ? { healthy: true, reason: 'ok' }
+      : { healthy: false, reason: 'realtime not initialized' };
     this.currentCall = null;
     this.recordingWork = Promise.resolve();
     this.phoneDataWork = Promise.resolve();

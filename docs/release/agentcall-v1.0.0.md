@@ -1,6 +1,6 @@
-# AgentCall 0.2.5
+# AgentCall 1.0.0
 
-AgentCall 0.2.5 is a repository, distribution, and presentation update for the
+AgentCall 1.0.0 is the first stable, hardware-qualified release for the
 hardware-qualified AgentCall stack. It ships matched Android, Magisk, Windows,
 and Debian artifacts from the same source revision.
 
@@ -21,11 +21,11 @@ and Debian artifacts from the same source revision.
 
 ## Downloads
 
-- `AgentCall-2.8.54-332.apk` - Android default-dialer application.
-- `AgentCall-privileged-2.8.54-332-magisk.zip` - matched AgentCall privileged
+- `AgentCall-1.0.0-332.apk` - Android default-dialer application.
+- `AgentCall-privileged-1.0.0-332-magisk.zip` - matched AgentCall privileged
   Magisk module.
-- `agentcall-desktop-0.2.5-x64-setup.exe` - Windows x86-64 installer.
-- `agentcall-desktop-0.2.5-amd64.deb` - Ubuntu/Debian x86-64 package.
+- `agentcall-desktop-1.0.0-x64-setup.exe` - Windows x86-64 installer.
+- `agentcall-desktop-1.0.0-amd64.deb` - Ubuntu/Debian x86-64 package.
 - `SHA256SUMS` - SHA-256 checksums for the four installable artifacts.
 - `ARTIFACT-STATUS.txt` and `ANDROID-ROLLBACK-MANIFEST.txt` - Android build,
   pairing, and rollback evidence.
@@ -37,7 +37,7 @@ selection, USB pairing, provider setup, and Hermes/OpenClaw MCP configuration.
 ## Qualification and signing
 
 The functional runtime remains the physically qualified AgentCall 0.2.4
-architecture. AgentCall 0.2.5 updates project identity, packaging metadata, and
+architecture. AgentCall 1.0.0 updates project identity, packaging metadata, and
 documentation without changing the cellular media path.
 
 The distributed Android APK uses the qualification signing identity. The

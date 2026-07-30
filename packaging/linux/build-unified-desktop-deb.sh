@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-version=0.2.5
+version=1.0.0
 output=
 root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 

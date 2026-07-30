@@ -109,7 +109,7 @@ test('stdio runner starts and stops daemon event stream with its lifecycle', asy
 test('initialize negotiates MCP protocolVersion 2024-11-05', async () => {
   const response = await new McpHandler(fakeGateway()).handle({ jsonrpc: '2.0', id: 1, method: 'initialize' });
   assert.equal(response.result.protocolVersion, '2024-11-05');
-  assert.deepEqual(response.result.serverInfo, { name: 'agentcall-mcp', version: '0.2.5' });
+  assert.deepEqual(response.result.serverInfo, { name: 'agentcall-mcp', version: '1.0.0' });
 });
 
 test('tools/list exposes exactly required strict schemas with no PCM surface', async () => {

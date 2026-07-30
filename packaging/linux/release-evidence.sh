@@ -4,7 +4,7 @@ set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 gateway_source=
 output=
-version=0.2.5
+version=1.0.0
 
 usage() {
   printf 'usage: %s --gateway-source ABSOLUTE_PATH --output DIRECTORY [--version VERSION]\n' "$0" >&2

@@ -35,17 +35,17 @@ https://github.com/sidinsearch/AgentCall-AGPL/releases
 
 Download the assets for your platform:
 
-- `agentcall-desktop-0.2.5-amd64.deb`;
-- `agentcall-desktop-0.2.5-x64-setup.exe`;
-- `AgentCall-2.8.54-332.apk`;
-- `AgentCall-privileged-2.8.54-332-magisk.zip`.
+- `agentcall-desktop-1.0.0-amd64.deb`;
+- `agentcall-desktop-1.0.0-x64-setup.exe`;
+- `AgentCall-1.0.0-332.apk`;
+- `AgentCall-privileged-1.0.0-332-magisk.zip`.
 
 Choose either the APK or Magisk ZIP for installation, never both. Verify each downloaded file against the SHA-256 values printed in the release notes:
 
 ```bash
-sha256sum agentcall-desktop-0.2.5-amd64.deb \
-  AgentCall-2.8.54-332.apk \
-  AgentCall-privileged-2.8.54-332-magisk.zip
+sha256sum agentcall-desktop-1.0.0-amd64.deb \
+  AgentCall-1.0.0-332.apk \
+  AgentCall-privileged-1.0.0-332-magisk.zip
 ```
 
 Compare all three values with the release-note manifest before continuing.
@@ -54,17 +54,17 @@ Compare all three values with the release-note manifest before continuing.
 
 ### Option A — ordinary APK
 
-Use `AgentCall-2.8.54-332.apk` for UI/development validation without protected telephony-audio permissions.
+Use `AgentCall-1.0.0-332.apk` for UI/development validation without protected telephony-audio permissions.
 
 ```bash
-adb install AgentCall-2.8.54-332.apk
+adb install AgentCall-1.0.0-332.apk
 ```
 
 This does not qualify the protected full-duplex route.
 
 ### Option B — matched Magisk module
 
-Use `AgentCall-privileged-2.8.54-332-magisk.zip` for the qualified rooted-device path. The module already embeds the exact matched APK and protected-permission allowlist.
+Use `AgentCall-privileged-1.0.0-332-magisk.zip` for the qualified rooted-device path. The module already embeds the exact matched APK and protected-permission allowlist.
 
 Do **not** separately install the APK and module. Review the ZIP contents and hash first, install it through Magisk, require a successful installer exit, then reboot. Do not globally weaken SELinux, clear package caches or grant unrelated permissions.
 
@@ -76,7 +76,7 @@ adb shell dumpsys package com.callagent.gateway
 adb shell cmd role get-role-holders android.app.role.DIALER
 ```
 
-Confirm the expected package version `2.8.54 (332)`, requested/granted privileges, launcher activity and system package path. If Package Manager metadata disagrees with the mounted APK, stop; do not test calls.
+Confirm the expected package version `1.0.0 (332)`, requested/granted privileges, launcher activity and system package path. If Package Manager metadata disagrees with the mounted APK, stop; do not test calls.
 
 ### Android rollback
 
@@ -103,7 +103,7 @@ The result must include `com.callagent.gateway` before relying on Telecom callba
 Install the release package:
 
 ```bash
-sudo apt install ./agentcall-desktop-0.2.5-amd64.deb
+sudo apt install ./agentcall-desktop-1.0.0-amd64.deb
 ```
 
 This single package installs the Electron desktop UI, `gatewayd`, MCP launcher, systemd unit, health tools and first-install defaults. It enables and starts `agentcall-gatewayd`; no phone is mutated by Linux package installation. The daemon may run safely without a phone and reports that it is waiting for ADB/Android authorization.

@@ -98,13 +98,13 @@ python3 tools/build_manifest.py --verify-final "$apk"
 packaging/android/build-artifacts.sh \
   --apk "$apk" \
   --output "$out" \
-  --version-name 2.8.54 \
+  --version-name 1.0.0 \
   --version-code 332 \
   --classification production-signed
 
 cat > "$out/PRODUCTION-SIGNING-EVIDENCE.txt" <<EOF
 Android package: com.callagent.gateway
-Android version: 2.8.54 (332)
+Android version: 1.0.0 (332)
 Signing certificate SHA-256: $manifest_digest
 Canonical manifest binding: VERIFIED
 Embedded manifest binding: VERIFIED

@@ -116,6 +116,16 @@ test('provider pair test delegates only to the active registry and fails closed 
   await assert.rejects(runningGateway().gateway.testProviders(), /realtime.*inactive/i);
 });
 
+test('status reports a configured realtime engine ready while no call is active', () => {
+  const configured = runningGateway({ createRealtimeSession: async () => ({}) }).gateway.status().realtime;
+  assert.deepEqual(configured, { healthy: true, reason: 'ok', active: false });
+
+  const inactive = runningGateway().gateway.status().realtime;
+  assert.deepEqual(inactive, {
+    healthy: false, reason: 'realtime not initialized', active: false,
+  });
+});
+
 test('phone-data snapshots are private, capability-negotiated, and readable offline', async () => {
   const calls = { capabilities: [], consumed: [] };
   const phoneData = {

@@ -9,7 +9,7 @@ class InstalledArtifactIdentityVerifierTest {
     private val manifest = MatchedArtifactManifest(
         schemaVersion = 1,
         bootstrapProtocolVersion = 1,
-        desktopPackageVersion = "0.2.5",
+        desktopPackageVersion = "1.0.0",
         androidPackageName = "com.callagent.gateway",
         androidVersionCode = 332,
         androidSigningCertificateSha256 = signer,
