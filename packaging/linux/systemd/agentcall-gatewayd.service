@@ -1,0 +1,74 @@
+[Unit]
+Description=agentcall USB-only cellular agent gateway
+Documentation=file:/usr/share/doc/agentcall-gatewayd/README.md
+After=local-fs.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=agentcall
+Group=agentcall
+Environment=AGENTCALL_MODE=hardware
+Environment=AGENTCALL_MATCHED_ARTIFACT_FILE=/usr/share/agentcall/protocol/matched-artifact.properties
+Environment=AGENTCALL_CONTROLLER_SECRET_FILE=/var/lib/agentcall/controller/controller.key
+Environment=AGENTCALL_REDACTION_SALT_FILE=/var/lib/agentcall/redaction-salt
+Environment=AGENTCALL_ADB_HOME=/var/lib/agentcall/adb
+Environment=AGENTCALL_ADB_SERVER_SOCKET=tcp:127.0.0.1:15037
+Environment=AGENTCALL_HOST_PORT=5040
+Environment=AGENTCALL_PHONE_PORT=27183
+Environment=AGENTCALL_DIAL_ENABLED=false
+Environment=AGENTCALL_RECORDING_REQUIRED=true
+Environment=AGENTCALL_RECORDING_ROOT=/var/lib/agentcall/recordings
+Environment=AGENTCALL_RECORDING_MIN_FREE_BYTES=1073741824
+Environment=AGENTCALL_REALTIME_ENABLED=false
+Environment=AGENTCALL_CALLER_MEMORY_ENABLED=false
+EnvironmentFile=-/etc/agentcall/gateway.env
+ExecStartPre=/usr/lib/agentcall/bin/agentcall-preflight
+ExecStart=/usr/bin/agentcall-gatewayd
+Restart=on-failure
+RestartSec=10s
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+UMask=0077
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=no
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+# ProtectClock installs a device-cgroup allowlist. Admit USB character devices
+# at that layer; the exact 18d1:4ee2/4ee7 udev rules and 0660 agentcall ownership remain
+# the per-device authorization boundary.
+DeviceAllow=char-usb_device rw
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+# Node/V8 requires controlled writable-to-executable transitions for generated
+# baseline/JIT code. Keep the remaining namespace, filesystem, capability, and
+# syscall restrictions instead of enabling MemoryDenyWriteExecute.
+MemoryDenyWriteExecute=no
+RemoveIPC=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+ReadWritePaths=/var/lib/agentcall /run/agentcall
+ReadOnlyPaths=/etc/agentcall
+RuntimeDirectory=agentcall
+RuntimeDirectoryMode=0750
+StateDirectory=agentcall
+StateDirectoryMode=0700
+LogsDirectory=agentcall
+LogsDirectoryMode=0700
+
+[Install]
+WantedBy=multi-user.target

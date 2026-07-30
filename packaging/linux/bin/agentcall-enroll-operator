@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+fail() { printf 'agentcall operator enrollment: %s\n' "$1" >&2; exit 1; }
+
+[ "$(id -u)" -eq 0 ] || fail "must run as root"
+[ "$#" -eq 1 ] || fail "usage: agentcall-enroll-operator USER"
+operator=$1
+case "$operator" in ''|[!A-Za-z0-9]*|*[!A-Za-z0-9._-]*) fail "user name is invalid";; esac
+[ "$operator" != root ] && [ "$operator" != agentcall ] || fail "system accounts cannot be operators"
+entry=$(getent passwd "$operator") || fail "user does not exist"
+uid=$(printf '%s\n' "$entry" | cut -d: -f3)
+shell=$(printf '%s\n' "$entry" | cut -d: -f7)
+uid_min=$(awk '$1 == "UID_MIN" { print $2; exit }' /etc/login.defs 2>/dev/null || true)
+case "$uid_min" in ''|*[!0-9]*) uid_min=1000;; esac
+case "$uid" in ''|*[!0-9]*) fail "user id is invalid";; esac
+[ "$uid" -ge "$uid_min" ] || fail "system accounts cannot be operators"
+case "$shell" in */nologin|*/false|'') fail "user is not an interactive account";; esac
+getent group agentcall >/dev/null 2>&1 || fail "agentcall group is unavailable"
+
+if id -nG "$operator" | tr ' ' '\n' | grep -Fx agentcall >/dev/null; then
+  printf 'agentcall operator enrollment: %s is already enrolled\n' "$operator"
+else
+  usermod -a -G agentcall "$operator"
+  printf 'agentcall operator enrollment: added %s to the agentcall group\n' "$operator"
+fi
+printf 'agentcall operator enrollment: operator access becomes active after a new login session\n'

@@ -1,0 +1,41 @@
+#!/bin/sh
+set -eu
+
+fail() { printf 'agentcall enrollment: %s\n' "$1" >&2; exit 1; }
+
+[ "$(id -u)" -eq 0 ] || fail "must run as root"
+getent group agentcall >/dev/null 2>&1 || fail "agentcall group is unavailable"
+
+target=/etc/agentcall/controller.key
+[ -d /etc/agentcall ] || fail "/etc/agentcall is unavailable"
+chown root:agentcall /etc/agentcall
+chmod 0750 /etc/agentcall
+tmp=$(mktemp /etc/agentcall/.controller.key.XXXXXX)
+trap 'rm -f "$tmp"' EXIT INT TERM
+umask 0077
+
+python3 -c '
+import base64
+import getpass
+import re
+import sys
+
+value = getpass.getpass("Controller credential from phone: ") if sys.stdin.isatty() else sys.stdin.read()
+value = value.strip()
+if not re.fullmatch(r"[A-Za-z0-9_-]{43}", value):
+    raise SystemExit("controller credential must be one 43-character base64url value")
+try:
+    secret = base64.urlsafe_b64decode(value + "=")
+except Exception as exc:
+    raise SystemExit("controller credential is invalid") from exc
+if len(secret) != 32:
+    raise SystemExit("controller credential must decode to exactly 32 bytes")
+sys.stdout.buffer.write(secret)
+' > "$tmp" || fail "credential was not installed"
+
+[ "$(wc -c < "$tmp")" -eq 32 ] || fail "decoded credential must contain exactly 32 bytes"
+chown root:agentcall "$tmp"
+chmod 0640 "$tmp"
+mv -f "$tmp" "$target"
+trap - EXIT INT TERM
+printf 'agentcall enrollment: controller credential installed at %s\n' "$target"

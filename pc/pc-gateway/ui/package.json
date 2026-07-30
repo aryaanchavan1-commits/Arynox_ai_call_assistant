@@ -1,0 +1,112 @@
+{
+  "name": "agentcall-desktop",
+  "version": "0.2.5",
+  "private": true,
+  "description": "Secure daemon-backed Electron operations client for the USB-only AgentCall cellular agent gateway.",
+  "homepage": "https://github.com/sidinsearch/AgentCall-AGPL",
+  "author": {
+    "name": "Sidin Search",
+    "email": "sidinsearch.inbox@gmail.com"
+  },
+  "desktopName": "agentcall-desktop",
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "check": "node --test test/*.test.js && node --check electron/agent-supervisor.js && node --check electron/daemon-client.js && node --check electron/ipc.js && node --check electron/main.js && node --check electron/managed-gateway.js && node --check electron/recording-media.js && node --check electron/security.js && node --check renderer/app.js",
+    "stage:windows": "node scripts/stage-windows-tools.mjs",
+    "dist": "electron-builder --linux deb",
+    "dist:windows": "npm run stage:windows && electron-builder --win nsis"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "electron": "39.8.10",
+    "electron-builder": "26.15.3",
+    "ws": "8.21.1"
+  },
+  "build": {
+    "appId": "dev.sidx.agentcall.desktop",
+    "productName": "AgentCall Desktop",
+    "asar": true,
+    "files": [
+      "electron/**/*",
+      "renderer/**/*",
+      "lib/**/*",
+      "package.json",
+      "README.md",
+      "LICENSE",
+      "NOTICE",
+      "THIRD_PARTY_NOTICES.md",
+      "build/icon.png"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Network",
+      "maintainer": "Sidin Search <sidinsearch.inbox@gmail.com>",
+      "syncDesktopName": true,
+      "icon": "build/icons",
+      "artifactName": "agentcall-desktop-${version}-${arch}.${ext}"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "agentcall-desktop-${version}-${arch}-setup.${ext}",
+      "extraResources": [
+        {
+          "from": "../src",
+          "to": "gateway/src"
+        },
+        {
+          "from": "../scripts/hermes-voice-supervisor.js",
+          "to": "gateway/scripts/hermes-voice-supervisor.js"
+        },
+        {
+          "from": "../package.json",
+          "to": "gateway/package.json"
+        },
+        {
+          "from": "../../../protocol/matched-artifact.properties",
+          "to": "gateway/matched-artifact.properties"
+        },
+        {
+          "from": "node_modules/ws",
+          "to": "gateway/node_modules/ws"
+        },
+        {
+          "from": "build/windows-tools",
+          "to": "platform-tools"
+        },
+        {
+          "from": "resources/windows/agentcall-mcp.cmd",
+          "to": "bin/agentcall-mcp.cmd"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AgentCall Desktop"
+    },
+    "deb": {
+      "depends": [
+        "libgtk-3-0",
+        "libnss3",
+        "libasound2"
+      ],
+      "priority": "optional"
+    }
+  },
+  "license": "AGPL-3.0-only"
+}

@@ -1,0 +1,104 @@
+#!/bin/sh
+set -eu
+
+archive=${1:-}
+target=${2:-}
+[ -n "$archive" ] && [ -n "$target" ] || {
+  printf 'usage: agentcall-restore-state BACKUP.tar.gz EMPTY_OFFLINE_ROOT\n' >&2
+  exit 2
+}
+case "$archive" in /*) ;; *) printf 'archive must be an absolute path\n' >&2; exit 2;; esac
+case "$target" in /*) ;; *) printf 'target must be an absolute path\n' >&2; exit 2;; esac
+[ -f "$archive" ] || { printf 'backup archive missing\n' >&2; exit 1; }
+[ -f "$archive.sha256" ] || { printf 'backup checksum missing\n' >&2; exit 1; }
+[ ! -e "$target" ] || { printf 'target must not already exist\n' >&2; exit 1; }
+
+archive_dir=$(dirname "$archive")
+archive_name=$(basename "$archive")
+checksum_name=$(basename "$archive.sha256")
+(
+  cd "$archive_dir"
+  expected=$(sed -n '1{s/[[:space:]].*$//;p;}' "$checksum_name")
+  case "$expected" in
+    [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+    *) printf 'backup checksum is malformed\n' >&2; exit 1;;
+  esac
+  actual=$(sha256sum "$archive_name" | sed 's/[[:space:]].*$//')
+  [ "$actual" = "$expected" ] || { printf 'backup checksum mismatch\n' >&2; exit 1; }
+)
+
+state=${AGENTCALL_STATE_DIR:-/var/lib/agentcall}
+config=${AGENTCALL_CONFIG_DIR:-/etc/agentcall}
+case "$state" in /*) ;; *) printf 'state directory must be absolute\n' >&2; exit 2;; esac
+case "$config" in /*) ;; *) printf 'config directory must be absolute\n' >&2; exit 2;; esac
+state_rel=${state#/}
+config_rel=${config#/}
+[ -n "$state_rel" ] && [ -n "$config_rel" ] || { printf 'root directory cannot be restored\n' >&2; exit 2; }
+[ "$state_rel" != "$config_rel" ] || { printf 'state and config roots must differ\n' >&2; exit 2; }
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT INT TERM
+python3 - "$archive" "$state_rel" "$config_rel" <<'PY'
+import posixpath
+import sys
+import tarfile
+
+archive, state_root, config_root = sys.argv[1:]
+allowed_roots = (state_root, config_root)
+try:
+    with tarfile.open(archive, mode="r:gz") as handle:
+        members = handle.getmembers()
+except (OSError, tarfile.TarError):
+    print("backup archive is unreadable", file=sys.stderr)
+    raise SystemExit(1)
+if not members:
+    print("backup archive is empty", file=sys.stderr)
+    raise SystemExit(1)
+for member in members:
+    name = member.name
+    normalized = posixpath.normpath(name)
+    if (
+        not name
+        or name.startswith("/")
+        or normalized in (".", "..")
+        or normalized.startswith("../")
+        or normalized != name.rstrip("/")
+    ):
+        print("backup contains an unsafe path", file=sys.stderr)
+        raise SystemExit(1)
+    if not any(normalized == root or normalized.startswith(f"{root}/") for root in allowed_roots):
+        print("backup contains an unexpected path", file=sys.stderr)
+        raise SystemExit(1)
+    if not (member.isfile() or member.isdir()):
+        print("backup contains a link or unsupported entry", file=sys.stderr)
+        raise SystemExit(1)
+PY
+
+mkdir -m 0700 "$tmp/extracted"
+tar --extract --gzip --file "$archive" --directory "$tmp/extracted" \
+  --no-same-owner --no-same-permissions --delay-directory-restore
+
+find "$tmp/extracted" -type f \( -name manifest.json -o -path "*/caller-memory/callers/*.json" \) -print0 |
+  python3 -c '
+import json, os, sys
+MAX_SCHEMA = 1
+for raw in sys.stdin.buffer.read().split(b"\0"):
+    if not raw:
+        continue
+    path = os.fsdecode(raw)
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            value = json.load(handle)
+    except Exception:
+        print("backup contains malformed JSON state", file=sys.stderr)
+        raise SystemExit(1)
+    version = value.get("schemaVersion") if isinstance(value, dict) else None
+    if type(version) is not int or version < 1 or version > MAX_SCHEMA:
+        print("backup state schema is unsupported", file=sys.stderr)
+        raise SystemExit(1)
+'
+
+mv "$tmp/extracted" "$target"
+trap - EXIT INT TERM
+rm -rf "$tmp"
+printf '%s\n' "$target"

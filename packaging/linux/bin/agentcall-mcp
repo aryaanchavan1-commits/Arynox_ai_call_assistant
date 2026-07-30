@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+node_bin="${AGENTCALL_NODE_BIN:-/usr/bin/node}"
+mcp_script="${AGENTCALL_MCP_SCRIPT:-/usr/lib/agentcall/pc-gateway/src/mcp-server.js}"
+exec "$node_bin" "$mcp_script" "$@"

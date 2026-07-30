@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AgentCall</string>
+    <string name="unknown_caller">Unknown caller</string>
+    <string name="incoming_call">Incoming call</string>
+    <string name="calling">Calling…</string>
+    <string name="call_active">Call active</string>
+    <string name="call_on_hold">On hold</string>
+    <string name="ending_call">Ending call…</string>
+    <string name="call_ended">Call ended</string>
+    <string name="no_active_call">No active call</string>
+    <string name="answer">Answer</string>
+    <string name="reject">Reject</string>
+    <string name="end_call">End call</string>
+    <string name="gateway">Gateway</string>
+    <string name="tab_recents">Recents</string>
+    <string name="tab_contacts">Contacts</string>
+    <string name="tab_keypad">Keypad</string>
+    <string name="tab_recordings">Recordings</string>
+    <string name="phone_number">Phone number</string>
+    <string name="dial_0">0</string>
+    <string name="dial_1">1</string>
+    <string name="dial_2">2</string>
+    <string name="dial_3">3</string>
+    <string name="dial_4">4</string>
+    <string name="dial_5">5</string>
+    <string name="dial_6">6</string>
+    <string name="dial_7">7</string>
+    <string name="dial_8">8</string>
+    <string name="dial_9">9</string>
+    <string name="dial_star">*</string>
+    <string name="dial_hash">#</string>
+    <string name="dial_star_accessibility">Star</string>
+    <string name="dial_hash_accessibility">Hash</string>
+    <string name="delete_digit">Delete</string>
+    <string name="place_call">Call</string>
+    <string name="dialer_status_call_in_progress">Call in progress</string>
+    <string name="dialer_status_desktop_recorder_ready">Desktop recorder ready</string>
+    <string name="dialer_status_desktop_connected_recording_unavailable">Desktop connected · recording unavailable</string>
+    <string name="dialer_status_phone_available_gateway_not_ready">Phone available · gateway not ready</string>
+    <string name="project">Project</string>
+    <string name="agentcall_on_github">AgentCall on GitHub</string>
+</resources>

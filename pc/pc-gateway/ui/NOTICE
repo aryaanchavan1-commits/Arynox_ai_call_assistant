@@ -1,0 +1,21 @@
+AgentCall
+Copyright 2026 Sidin Search and AgentCall contributors
+
+AgentCall-owned source code is licensed under AGPL-3.0-only as stated in
+LICENSE.
+
+Historical provenance
+---------------------
+The project began as an experimental derivative of the public
+pulpoff/gsm2sip repository. Its original authors retain authorship and
+copyright in their work. Sidin Search does not claim authorship of historical
+commits or third-party code. The upstream repository did not contain an
+explicit license when it was imported; consequently, no upstream material is
+relicensed merely by this repository's LICENSE file. The private migration
+must replace or separately clear inherited material before the entire
+repository can be represented as AGPL-3.0-only.
+
+Third-party components remain under their respective licenses. Android, POCO,
+Xiaomi, Qualcomm, Samsung, Hermes, OpenClaw, OpenAI, ElevenLabs, and Supertonic
+names identify interoperability targets only and do not imply endorsement.
+See THIRD_PARTY_NOTICES.md for the included component and asset inventory.

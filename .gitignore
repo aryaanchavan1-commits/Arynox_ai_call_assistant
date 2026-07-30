@@ -1,0 +1,53 @@
+# Build outputs
+*.apk
+gateway-magisk.zip
+magisk/system/priv-app/Gateway/
+!magisk/system/priv-app/PermissionController/
+local.properties
+.env.build
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+
+# Gradle
+.gradle/
+build/
+app/build/
+
+# Node / Electron
+node_modules/
+# electron-builder input; keep generated build output ignored.
+!pc/pc-gateway/ui/build/
+!pc/pc-gateway/ui/build/icon.png
+pc/pc-gateway/ui/build/windows-tools/
+dist/
+pc/pc-gateway/ui/dist-*/
+coverage/
+*.log
+
+# Runtime state, local evidence, generated release artifacts, and secrets
+*.sock
+.env
+.env.*
+!.env.example
+/.hermes/
+/release/
+/release-qualification/
+/artifacts/
+/.codex-audit-src.tar
+/.codex-remote-attachments/
+/.codex-test-artifacts/
+*.deb
+*.AppImage
+*.bug
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# IDE
+.idea/
+*.iml
+.vscode/

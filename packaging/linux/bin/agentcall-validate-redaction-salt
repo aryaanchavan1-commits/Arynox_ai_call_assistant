@@ -1,0 +1,25 @@
+#!/usr/bin/python3
+import pathlib
+import sys
+
+
+def fail(message: str) -> None:
+    print(f"agentcall redaction salt: {message}", file=sys.stderr)
+    raise SystemExit(1)
+
+
+if len(sys.argv) != 2:
+    fail("usage: agentcall-validate-redaction-salt FILE")
+try:
+    raw = pathlib.Path(sys.argv[1]).read_bytes()
+except OSError:
+    fail("file is unreadable")
+value = raw[:-1] if raw.endswith(b"\n") else raw
+if not 16 <= len(value) <= 4096:
+    fail("content must contain 16..4096 bytes plus an optional final LF")
+try:
+    text = value.decode("utf-8", errors="strict")
+except UnicodeDecodeError:
+    fail("content must be valid UTF-8")
+if any(ord(char) < 32 or ord(char) == 127 for char in text):
+    fail("content must be one line without control characters")

@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+lines=${1:-200}
+case "$lines" in ''|*[!0-9]*) printf 'usage: agentcall-logs [LINES]\n' >&2; exit 2;; esac
+[ "$lines" -ge 1 ] && [ "$lines" -le 10000 ] || { printf 'line count out of range\n' >&2; exit 2; }
+exec journalctl --unit=agentcall-gatewayd.service --no-pager --output=short-iso --lines="$lines"

@@ -1,0 +1,14 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: AgentCall
+Source: https://github.com/sidinsearch/AgentCall-AGPL
+
+Files: *
+Copyright: 2026 Sidin Search and AgentCall contributors
+License: AGPL-3.0-only
+ The complete GNU Affero General Public License, Version 3 is shipped with this
+ package as /usr/share/doc/agentcall-gatewayd/LICENSE.
+
+Files: usr/lib/agentcall/pc-gateway/node_modules/ws/*
+Copyright: ws contributors
+License: MIT
+ See the dependency package metadata and included upstream license notices.

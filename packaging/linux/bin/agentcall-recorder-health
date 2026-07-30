@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+config=${AGENTCALL_CONFIG:-/etc/agentcall/gateway.env}
+if [ -r "$config" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  . "$config"
+  set +a
+fi
+
+exec /usr/bin/node /usr/lib/agentcall/pc-gateway/src/recording-health.js

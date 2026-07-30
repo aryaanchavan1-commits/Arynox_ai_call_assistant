@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand -->
+    <color name="primary">#0F766E</color>
+    <color name="primary_dark">#115E59</color>
+    <color name="primary_soft">#E3F5F2</color>
+    <color name="call_accept">#15803D</color>
+    <color name="on_call_accept">#FFFFFF</color>
+    <color name="tab_text_selected">#115E59</color>
+    <color name="dialer_status_text">#115E59</color>
+    <color name="call_end">#B42318</color>
+    <color name="danger">#B42318</color>
+
+    <!-- Backgrounds -->
+    <color name="background">#F9FAFB</color>
+    <color name="surface">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_primary">#111827</color>
+    <color name="text_label">#374151</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_log">#4B5563</color>
+    <color name="text_hint">#9CA3AF</color>
+    <color name="hero_text_primary">#134E4A</color>
+    <color name="hero_text_secondary">#475569</color>
+
+    <!-- Buttons -->
+    <color name="btn_secondary">#374151</color>
+
+    <!-- Borders -->
+    <color name="border_input">#D1D5DB</color>
+    <color name="border_card">#E5E7EB</color>
+
+    <!-- Status bar -->
+    <color name="status_bar">#FFFFFF</color>
+</resources>

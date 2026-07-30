@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a reproducible agentcall software or packaging defect
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include phone numbers, SIM identifiers, ADB keys, controller credentials, provider keys, recordings, or unredacted call logs.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Android app
+        - Linux gatewayd / MCP
+        - Desktop application
+        - Debian / AppImage packaging
+        - Magisk packaging
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Redacted environment
+      description: OS, Android version, device codename/board, app/package version, and exact commit. Omit serials and secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Redacted evidence
+      description: Include bounded logs or test output only after removing sensitive data.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I removed credentials, phone numbers, recordings, SIM/device identifiers, and private fingerprints.
+          required: true
+        - label: I did not weaken SELinux or clear global Android package/system caches.
+          required: true

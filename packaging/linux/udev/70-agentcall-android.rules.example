@@ -1,0 +1,4 @@
+# Administrator template only; NOT installed automatically.
+# Replace IDs with the approved phone's exact USB vendor/product IDs.
+# Never use MODE="0666". Membership is limited to the agentcall service account.
+SUBSYSTEM=="usb", ATTR{idVendor}=="REPLACE_VENDOR", ATTR{idProduct}=="REPLACE_PRODUCT", GROUP="agentcall", MODE="0660", TAG+="uaccess"

@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+# Release identity is package-owned. Ignore retired manual-pairing selectors
+# preserved in administrator configuration from older installations.
+unset ADB_VENDOR_KEYS AGENTCALL_DEVICE_SERIAL AGENTCALL_DEVICE_FINGERPRINT
+exec /usr/bin/node /usr/lib/agentcall/pc-gateway/src/gatewayd.js "$@"

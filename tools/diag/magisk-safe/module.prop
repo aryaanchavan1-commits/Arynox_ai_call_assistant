@@ -1,0 +1,6 @@
+id=agentcall-atoll-diag
+name=agentcall atoll read-only diagnostics
+version=v0.1.0
+versionCode=1
+author=agentcall contributors
+description=Optional diagnostic-only module: stages tinymix in /data/local/tmp. No APK privileges, app-ops, PermissionController, system properties, or mixer writes.

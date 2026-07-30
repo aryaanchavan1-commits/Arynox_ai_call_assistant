@@ -1,0 +1,58 @@
+name: Device port proposal
+description: Propose or report qualification evidence for another Android device
+title: "device: "
+labels: [device-port]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read docs/DEVICE_PORTING.md first. Recognition is not qualification. Never upload proprietary vendor files, credentials, phone numbers, recordings, IMEI/MEID, SIM IDs, or ADB keys.
+  - type: input
+    id: device
+    attributes:
+      label: Manufacturer, model, and codename
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Board/platform and Android API
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Evidence level
+      options:
+        - Unknown
+        - Recognized
+        - Diagnostic-only
+        - RX-qualified
+        - Full-duplex qualified
+        - Release-supported
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Objective evidence
+      description: Frame counts, duration, loss/gaps, RMS/peak, latency, lifecycle tests, route restoration, and exact NOT RUN gates.
+    validations:
+      required: true
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Cleanup and rollback
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I ran ./verify.sh and reported its exact result.
+          required: true
+        - label: I separated observed PASS from NOT RUN and assumptions.
+          required: true
+        - label: I removed personal data, credentials, recordings, serials, and proprietary artifacts.
+          required: true

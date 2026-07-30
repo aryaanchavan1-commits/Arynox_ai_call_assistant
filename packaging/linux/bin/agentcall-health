@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+state_dir=${AGENTCALL_STATE_DIR:-/var/lib/agentcall}
+runtime_dir=${AGENTCALL_RUNTIME_DIR:-/run/agentcall}
+
+printf '{'
+printf '"stateDirWritable":%s,' "$(test -w "$state_dir" && printf true || printf false)"
+printf '"runtimeDirWritable":%s,' "$(test -w "$runtime_dir" && printf true || printf false)"
+printf '"adbAvailable":%s,' "$(command -v adb >/dev/null 2>&1 && printf true || printf false)"
+printf '"nodeAvailable":%s' "$(command -v node >/dev/null 2>&1 && printf true || printf false)"
+printf '}\n'

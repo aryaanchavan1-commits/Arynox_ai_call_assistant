@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvInCallState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:accessibilityLiveRegion="assertive"
+            android:background="@drawable/status_panel_bg"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:textColor="@color/primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvInCallName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/text_primary"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvInCallNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            android:textIsSelectable="true"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnInCallAnswer"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/call_accept_button_bg"
+                android:text="@string/answer"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnInCallReject"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/call_end_button_bg"
+                android:text="@string/reject"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnInCallEnd"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@drawable/call_end_button_bg"
+                android:text="@string/end_call"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <GridLayout
+            android:id="@+id/inCallKeypad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:columnCount="3"
+            android:visibility="gone">
+
+            <Button android:id="@+id/btnDtmf1" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="1" />
+            <Button android:id="@+id/btnDtmf2" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="2" />
+            <Button android:id="@+id/btnDtmf3" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="3" />
+            <Button android:id="@+id/btnDtmf4" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="4" />
+            <Button android:id="@+id/btnDtmf5" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="5" />
+            <Button android:id="@+id/btnDtmf6" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="6" />
+            <Button android:id="@+id/btnDtmf7" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="7" />
+            <Button android:id="@+id/btnDtmf8" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="8" />
+            <Button android:id="@+id/btnDtmf9" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="9" />
+            <Button android:id="@+id/btnDtmfStar" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="*" />
+            <Button android:id="@+id/btnDtmf0" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="0" />
+            <Button android:id="@+id/btnDtmfHash" style="@style/DialButton" android:layout_width="0dp" android:layout_columnWeight="1" android:text="#" />
+        </GridLayout>
+    </LinearLayout>
+</ScrollView>

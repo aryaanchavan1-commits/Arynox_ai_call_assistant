@@ -1,0 +1,118 @@
+#!/bin/sh
+set -eu
+
+fail() { printf 'agentcall preflight: %s\n' "$1" >&2; exit 1; }
+
+case "${AGENTCALL_MODE:-hardware}" in
+  hardware)
+    [ "$(stat -c %U:%G /etc/agentcall)" = "root:agentcall" ] || fail "configuration directory must be owned by root:agentcall"
+    [ "$(stat -c %a /etc/agentcall)" = "750" ] || fail "configuration directory mode must be exactly 0750"
+    : "${AGENTCALL_CONTROLLER_SECRET_FILE:?AGENTCALL_CONTROLLER_SECRET_FILE is required}"
+    : "${AGENTCALL_REDACTION_SALT_FILE:?AGENTCALL_REDACTION_SALT_FILE is required}"
+    zero_touch=false
+    [ -z "${AGENTCALL_MATCHED_ARTIFACT_FILE:-}" ] || zero_touch=true
+    case "$AGENTCALL_CONTROLLER_SECRET_FILE" in /*) ;; *) fail "controller secret path must be absolute";; esac
+    case "$AGENTCALL_REDACTION_SALT_FILE" in /*) ;; *) fail "redaction salt path must be absolute";; esac
+    if [ "$zero_touch" = true ]; then
+      case "$AGENTCALL_MATCHED_ARTIFACT_FILE" in /*) ;; *) fail "matched artifact path must be absolute";; esac
+      [ -f "$AGENTCALL_MATCHED_ARTIFACT_FILE" ] && [ ! -L "$AGENTCALL_MATCHED_ARTIFACT_FILE" ] || fail "matched artifact must be a regular non-symlink file"
+      [ "$(stat -c %U:%G "$AGENTCALL_MATCHED_ARTIFACT_FILE")" = "root:root" ] || fail "matched artifact owner is invalid"
+      [ "$(stat -c %a "$AGENTCALL_MATCHED_ARTIFACT_FILE")" = "644" ] || fail "matched artifact mode must be exactly 0644"
+      controller_dir=${AGENTCALL_CONTROLLER_SECRET_FILE%/*}
+      if [ -e "$controller_dir" ] || [ -L "$controller_dir" ]; then
+        [ -d "$controller_dir" ] && [ ! -L "$controller_dir" ] || fail "controller credential state is unsafe"
+        [ "$(stat -c %U:%G "$controller_dir")" = "agentcall:agentcall" ] || fail "controller credential state is unsafe"
+        [ "$(stat -c %a "$controller_dir")" = "700" ] || fail "controller credential state is unsafe"
+      fi
+      for credential in "$AGENTCALL_CONTROLLER_SECRET_FILE" "$AGENTCALL_CONTROLLER_SECRET_FILE.staged"; do
+        if [ -e "$credential" ] || [ -L "$credential" ]; then
+          [ -f "$credential" ] && [ ! -L "$credential" ] || fail "controller credential state is unsafe"
+          [ "$(stat -c %U:%G "$credential")" = "agentcall:agentcall" ] || fail "controller credential state is unsafe"
+          [ "$(stat -c %a "$credential")" = "600" ] || fail "controller credential state is unsafe"
+          size=$(wc -c < "$credential")
+          [ "$size" -ge 38 ] && [ "$size" -le 165 ] || fail "controller credential state is unsafe"
+        fi
+      done
+      if [ -e "$AGENTCALL_REDACTION_SALT_FILE" ] || [ -L "$AGENTCALL_REDACTION_SALT_FILE" ]; then
+        [ -f "$AGENTCALL_REDACTION_SALT_FILE" ] && [ ! -L "$AGENTCALL_REDACTION_SALT_FILE" ] || fail "service redaction salt state is unsafe"
+        [ "$(stat -c %U:%G "$AGENTCALL_REDACTION_SALT_FILE")" = "agentcall:agentcall" ] || fail "service redaction salt state is unsafe"
+        [ "$(stat -c %a "$AGENTCALL_REDACTION_SALT_FILE")" = "600" ] || fail "service redaction salt state is unsafe"
+        [ "$(wc -c < "$AGENTCALL_REDACTION_SALT_FILE")" -eq 43 ] || fail "service redaction salt state is unsafe"
+      fi
+    else
+      : "${AGENTCALL_DEVICE_SERIAL:?AGENTCALL_DEVICE_SERIAL is required}"
+      : "${AGENTCALL_DEVICE_FINGERPRINT:?AGENTCALL_DEVICE_FINGERPRINT is required}"
+      : "${ADB_VENDOR_KEYS:?ADB_VENDOR_KEYS is required}"
+      [ "$AGENTCALL_DEVICE_SERIAL" != "REPLACE_WITH_EXACT_ADB_SERIAL" ] || fail "device serial placeholder is not allowed"
+      [ "$AGENTCALL_DEVICE_FINGERPRINT" != "REPLACE_WITH_APPROVED_BUILD_FINGERPRINT" ] || fail "device fingerprint placeholder is not allowed"
+      [ -r "$ADB_VENDOR_KEYS" ] || fail "ADB host key is not readable"
+      [ -f "$AGENTCALL_CONTROLLER_SECRET_FILE" ] && [ ! -L "$AGENTCALL_CONTROLLER_SECRET_FILE" ] || fail "controller secret must be a regular non-symlink file"
+      [ "$(stat -c %U:%G "$AGENTCALL_CONTROLLER_SECRET_FILE")" = "root:agentcall" ] || fail "controller secret must be owned by root:agentcall"
+      [ "$(stat -c %a "$AGENTCALL_CONTROLLER_SECRET_FILE")" = "640" ] || fail "controller secret mode must be exactly 0640"
+      [ "$(wc -c < "$AGENTCALL_CONTROLLER_SECRET_FILE")" -eq 32 ] || fail "controller secret must contain exactly 32 bytes"
+      [ -f "$AGENTCALL_REDACTION_SALT_FILE" ] && [ ! -L "$AGENTCALL_REDACTION_SALT_FILE" ] || fail "redaction salt must be a regular non-symlink file"
+      [ "$(stat -c %U:%G "$AGENTCALL_REDACTION_SALT_FILE")" = "root:agentcall" ] || fail "redaction salt must be owned by root:agentcall"
+      [ "$(stat -c %a "$AGENTCALL_REDACTION_SALT_FILE")" = "640" ] || fail "redaction salt mode must be exactly 0640"
+      /usr/lib/agentcall/bin/agentcall-validate-redaction-salt "$AGENTCALL_REDACTION_SALT_FILE" || fail "redaction salt content is invalid"
+    fi
+    ;;
+  simulator) ;;
+  *) fail "AGENTCALL_MODE must be hardware or simulator" ;;
+esac
+[ "${AGENTCALL_RECORDING_REQUIRED:-true}" = "true" ] || fail "recording must remain required"
+case "${AGENTCALL_DIAL_ENABLED:-true}" in
+  false) ;;
+  true)
+    if [ -n "${AGENTCALL_DIAL_ALLOW_NUMBERS:-}" ]; then
+      old_ifs=$IFS
+      IFS=,
+      set -- $AGENTCALL_DIAL_ALLOW_NUMBERS
+      IFS=$old_ifs
+      [ "$#" -ge 1 ] && [ "$#" -le 32 ] || fail "dial allowlist size is invalid"
+      for number in "$@"; do
+        case "$number" in +[1-9][0-9][0-9][0-9][0-9][0-9]*) ;;
+          *) fail "dial allowlist entry is not strict E.164" ;;
+        esac
+        digits=${number#+}
+        [ "${#digits}" -le 15 ] || fail "dial allowlist entry is too long"
+        case "$digits" in *[!0-9]*) fail "dial allowlist entry is not strict E.164";; esac
+      done
+    fi
+    ;;
+  *) fail "AGENTCALL_DIAL_ENABLED must be true or false" ;;
+esac
+[ -x "$(command -v adb 2>/dev/null || true)" ] || fail "adb executable not found"
+[ -x "$(command -v node 2>/dev/null || true)" ] || fail "node executable not found"
+
+case "${AGENTCALL_REALTIME_ENABLED:-false}" in
+  false) ;;
+  true)
+    case "${AGENTCALL_STT_PROVIDER:-}" in
+      openai) [ -n "${OPENAI_API_KEY:-}" ] || fail "OpenAI STT requires OPENAI_API_KEY" ;;
+      elevenlabs) [ -n "${ELEVENLABS_API_KEY:-}" ] || fail "ElevenLabs STT requires ELEVENLABS_API_KEY" ;;
+      *) fail "unsupported realtime STT provider" ;;
+    esac
+    case "${AGENTCALL_TTS_PROVIDER:-}" in
+      supertonic) ;;
+      openai) [ -n "${OPENAI_API_KEY:-}" ] || fail "OpenAI TTS requires OPENAI_API_KEY" ;;
+      elevenlabs) [ -n "${ELEVENLABS_API_KEY:-}" ] || fail "ElevenLabs TTS requires ELEVENLABS_API_KEY" ;;
+      *) fail "unsupported realtime TTS provider" ;;
+    esac
+    [ -n "${AGENTCALL_TTS_VOICE:-}" ] || fail "realtime TTS voice is required"
+    ;;
+  *) fail "AGENTCALL_REALTIME_ENABLED must be true or false" ;;
+esac
+
+case "${AGENTCALL_HOST_PORT:-}" in ''|*[!0-9]*) fail "host port must be numeric";; esac
+case "${AGENTCALL_PHONE_PORT:-}" in ''|*[!0-9]*) fail "phone port must be numeric";; esac
+[ "$AGENTCALL_HOST_PORT" -ge 1024 ] && [ "$AGENTCALL_HOST_PORT" -le 65535 ] || fail "host port out of range"
+[ "$AGENTCALL_PHONE_PORT" -ge 1024 ] && [ "$AGENTCALL_PHONE_PORT" -le 65535 ] || fail "phone port out of range"
+
+# Hardware mode fails closed unless the same recorder preflight used by gatewayd
+# confirms storage access, free-space reserve, and the mandatory review renderer.
+if [ "${AGENTCALL_MODE:-hardware}" = "hardware" ]; then
+  [ -x /usr/lib/agentcall/bin/agentcall-recorder-health ] || fail "recorder health gate unavailable"
+  /usr/lib/agentcall/bin/agentcall-recorder-health || fail "recorder unhealthy"
+fi
+
+exit 0
