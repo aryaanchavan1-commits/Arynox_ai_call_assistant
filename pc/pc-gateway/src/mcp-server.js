@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -311,7 +312,7 @@ export const TOOLS = Object.freeze([
   },
   {
     name: 'wait_for_turn',
-    description: 'Wait efficiently for the next complete remote caller turn or call end. AgentCall immediately plays an exact warmed prepared reply when a strong caller-intent match exists; when preparedReplySpoken is true, do not call speak for that turn and immediately wait again. Pass autoPreparedReply false to disable this behavior. Otherwise, brief contextual acknowledgements may play while response generation is pending; pass autoAcknowledge false to disable them.',
+    description: 'Use the exact camelCase fields callId and afterSequence. Wait efficiently for the next complete remote caller turn or call end. AgentCall immediately plays an exact warmed prepared reply when a strong caller-intent match exists; when preparedReplySpoken is true, do not call speak for that turn and immediately wait again. Pass autoPreparedReply false to disable this behavior. Otherwise, brief contextual acknowledgements may play while response generation is pending; pass autoAcknowledge false to disable them.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -327,7 +328,7 @@ export const TOOLS = Object.freeze([
   },
   {
     name: 'dial',
-    description: 'Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. AgentCall waits for the exact new call and live recording/media before playing the opening once. Supply one to four likely complete replies so AgentCall can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
+    description: 'Use exactly the camelCase fields destination, openingText, preparedReplies, approved, consent, and idempotencyKey; do not use number, opening, responses, or snake_case aliases. Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. AgentCall waits for the exact new call and live recording/media before playing the opening once. Supply one to four likely complete replies so AgentCall can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
     inputSchema: mutationSchema({
       destination: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },
       openingText: { type: 'string', minLength: 7, maxLength: 1_200 },
@@ -380,7 +381,7 @@ export const TOOLS = Object.freeze([
   },
   {
     name: 'speak',
-    description: 'Speak a bounded agent response into the matching active consented call. Pass the wait_for_turn sequence so a response is rejected instead of speaking over a newer caller turn.',
+    description: 'Use exactly the camelCase fields callId, text, respondingToSequence, and idempotencyKey; do not use call_id or snake_case aliases. Speak one complete natural response into the matching active consented call. Pass the wait_for_turn sequence so a response is rejected instead of speaking over a newer caller turn.',
     inputSchema: mutationSchema({
       callId: CALL_ID_SCHEMA,
       text: RESPONSE_TEXT_SCHEMA,
@@ -399,6 +400,29 @@ function isObject(value) {
 
 function boundedString(value, maxLength = 128) {
   return typeof value === 'string' && value.length > 0 && value.length <= maxLength;
+}
+
+function canonicalValue(value) {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (!isObject(value)) return value;
+  return Object.fromEntries(
+    Object.keys(value).sort().map((key) => [key, canonicalValue(value[key])]),
+  );
+}
+
+function downstreamIdempotencyKey(operation, args) {
+  const digest = createHash('sha256')
+    .update(JSON.stringify(canonicalValue({ operation, args })))
+    .digest('hex')
+    .slice(0, 48);
+  return `mcp-${operation}-${digest}`;
+}
+
+function downstreamMutationArgs(operation, args) {
+  return {
+    ...args,
+    idempotencyKey: downstreamIdempotencyKey(operation, args),
+  };
 }
 
 function validRequestId(id) {
@@ -1010,12 +1034,12 @@ export class McpHandler {
     if (opening?.ready !== true) {
       return { accepted: false, reason: 'opening speech unavailable' };
     }
-    const dialArgs = {
+    const dialArgs = downstreamMutationArgs('dial', {
       destination: args.destination,
       approved: args.approved,
       consent: args.consent,
       idempotencyKey: args.idempotencyKey,
-    };
+    });
     let receipt = await this.gateway.dial(dialArgs, { signal });
     if (receipt?.accepted !== true) return receipt;
     if (!boundedString(receipt.callId)) {
@@ -1051,7 +1075,11 @@ export class McpHandler {
       this.preparedOpeningCallIds.add(receipt.callId);
       this.preparedOpenings.set(receipt.callId, {
         text: args.openingText,
-        idempotencyKey: `mcp-opening-${args.idempotencyKey}`,
+        idempotencyKey: downstreamIdempotencyKey('protected-opening', {
+          callId: receipt.callId,
+          text: args.openingText,
+          idempotencyKey: args.idempotencyKey,
+        }),
         timer: null,
         started: false,
       });
@@ -1184,10 +1212,10 @@ export class McpHandler {
         })().catch(() => {});
         return { accepted: true, callId: args.callId, queued: texts.length };
       },
-      answer: () => this.gateway.answer(args, { signal }),
-      reject: () => this.gateway.reject(args, { signal }),
-      hangup: () => this.gateway.hangup(args, { signal }),
-      send_dtmf: () => this.gateway.sendDtmf(args, { signal }),
+      answer: () => this.gateway.answer(downstreamMutationArgs('answer', args), { signal }),
+      reject: () => this.gateway.reject(downstreamMutationArgs('reject', args), { signal }),
+      hangup: () => this.gateway.hangup(downstreamMutationArgs('hangup', args), { signal }),
+      send_dtmf: () => this.gateway.sendDtmf(downstreamMutationArgs('send-dtmf', args), { signal }),
       speak: async () => {
         await this._cancelAcknowledgement(args.callId);
         if (args.respondingToSequence !== undefined) {
@@ -1202,7 +1230,7 @@ export class McpHandler {
         return this.gateway.speak({
           callId: args.callId,
           text: args.text,
-          idempotencyKey: args.idempotencyKey,
+          idempotencyKey: downstreamIdempotencyKey('speak', args),
         }, { signal });
       },
     };

@@ -223,15 +223,17 @@ test('dial requires manual approval, strict recording consent, and E.164 before 
   const args = approvedDial({ consent, idempotencyKey: 'key-2' });
   const response = await handler.handle(call('dial', args));
   assert.equal(toolPayload(response).accepted, true);
-  assert.deepEqual(gateway.calls.slice(0, 2), [
-    ['prewarmSpeech', { text: args.openingText }],
-    ['dial', {
-      destination: args.destination,
-      approved: true,
-      consent,
-      idempotencyKey: 'key-2',
-    }],
-  ]);
+  assert.deepEqual(gateway.calls[0], ['prewarmSpeech', { text: args.openingText }]);
+  assert.deepEqual({
+    ...gateway.calls[1][1],
+    idempotencyKey: '[derived]',
+  }, {
+    destination: args.destination,
+    approved: true,
+    consent,
+    idempotencyKey: '[derived]',
+  });
+  assert.match(gateway.calls[1][1].idempotencyKey, /^mcp-dial-[a-f0-9]{48}$/);
 });
 
 test('dial fails closed before touching the phone when its opening is not ready', async () => {
@@ -314,15 +316,17 @@ test('dial automatically plays its prepared opening once when outgoing media bec
   });
   await new Promise((resolve) => setTimeout(resolve, 10));
   const spoken = gateway.calls.filter(([name]) => name === 'speak');
-  assert.deepEqual(spoken, [[
-    'speak',
-    {
-      callId: 'call-1',
-      text: args.openingText,
-      interruptible: false,
-      idempotencyKey: 'mcp-opening-opening-once-1',
-    },
-  ]]);
+  assert.equal(spoken.length, 1);
+  assert.deepEqual({
+    ...spoken[0][1],
+    idempotencyKey: '[derived]',
+  }, {
+    callId: 'call-1',
+    text: args.openingText,
+    interruptible: false,
+    idempotencyKey: '[derived]',
+  });
+  assert.match(spoken[0][1].idempotencyKey, /^mcp-protected-opening-[a-f0-9]{48}-1$/);
   assert.deepEqual(
     gateway.calls.filter(([name]) => name === 'prewarmSpeech').map(([, value]) => value.text),
     [args.openingText, ...args.preparedReplies],
@@ -501,12 +505,39 @@ test('speak routes bounded response text to the active call', async () => {
     callId: 'call-1', text: 'I can help.', idempotencyKey: 'speak-1',
   }));
   assert.equal(toolPayload(response).accepted, true);
-  assert.deepEqual(gateway.calls.at(-1), ['speak', {
-    callId: 'call-1', text: 'I can help.', idempotencyKey: 'speak-1',
-  }]);
+  assert.deepEqual({
+    ...gateway.calls.at(-1)[1],
+    idempotencyKey: '[derived]',
+  }, {
+    callId: 'call-1', text: 'I can help.', idempotencyKey: '[derived]',
+  });
+  assert.match(gateway.calls.at(-1)[1].idempotencyKey, /^mcp-speak-[a-f0-9]{48}$/);
   assert.equal((await handler.handle(call('speak', {
     callId: 'call-1', text: '', idempotencyKey: 'speak-2',
   }))).error.code, JSONRPC_ERROR.INVALID_PARAMS);
+});
+
+test('reused agent idempotency keys cannot collide across operations or different replies', async () => {
+  const gateway = fakeGateway();
+  const handler = new McpHandler(gateway);
+  const reused = 'agent-reused-one-key';
+  await handler.handle(call('dial', approvedDial({ idempotencyKey: reused })));
+  await handler.handle(call('speak', {
+    callId: 'call-1', text: 'The first complete reply.', respondingToSequence: 1,
+    idempotencyKey: reused,
+  }));
+  await handler.handle(call('speak', {
+    callId: 'call-1', text: 'The second complete reply.', respondingToSequence: 2,
+    idempotencyKey: reused,
+  }));
+  await handler.handle(call('hangup', { callId: 'call-1', idempotencyKey: reused }));
+
+  const keys = gateway.calls
+    .filter(([name]) => ['dial', 'speak', 'hangup'].includes(name))
+    .map(([, args]) => args.idempotencyKey);
+  assert.equal(keys.length, 4);
+  assert.equal(new Set(keys).size, 4);
+  assert.equal(keys.every((key) => /^mcp-[a-z-]+-[a-f0-9]{48}$/.test(key)), true);
 });
 
 test('status and capabilities route with empty arguments', async () => {
@@ -960,9 +991,14 @@ test('contextual acknowledgements are selective, delayed, rate-limited, and canc
     callId: 'call-ack', text: 'Here is my answer.', idempotencyKey: 'answer-fast',
   }));
   await new Promise((resolve) => setTimeout(resolve, 35));
-  assert.deepEqual(gateway.calls, [['speak', {
-    callId: 'call-ack', text: 'Here is my answer.', idempotencyKey: 'answer-fast',
-  }]]);
+  assert.equal(gateway.calls.length, 1);
+  assert.deepEqual({
+    ...gateway.calls[0][1],
+    idempotencyKey: '[derived]',
+  }, {
+    callId: 'call-ack', text: 'Here is my answer.', idempotencyKey: '[derived]',
+  });
+  assert.match(gateway.calls[0][1].idempotencyKey, /^mcp-speak-[a-f0-9]{48}$/);
 
   gateway.emit('event', {
     event: 'transcript_final', callId: 'call-ack', speaker: 'remote',
@@ -1050,11 +1086,15 @@ test('speak rejects a stale generated reply when the caller has already started 
   })));
   assert.equal(accepted.accepted, true);
   assert.equal(gateway.calls.length, 1);
-  assert.deepEqual(gateway.calls[0], ['speak', {
+  assert.deepEqual({
+    ...gateway.calls[0][1],
+    idempotencyKey: '[derived]',
+  }, {
     callId: 'call-stale',
     text: 'I am enjoying our conversation.',
-    idempotencyKey: 'fresh-answer-1',
-  }]);
+    idempotencyKey: '[derived]',
+  });
+  assert.match(gateway.calls[0][1].idempotencyKey, /^mcp-speak-[a-f0-9]{48}$/);
   handler.close();
 });
 
