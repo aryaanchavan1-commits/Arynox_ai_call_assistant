@@ -37,7 +37,7 @@ cmp -s "$fixture" "$apk"
 unzip -t "$module" >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'id=agentcall-privileged' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'name=AgentCall Privileged Telephony Bridge' >/dev/null
-unzip -p "$module" module.prop | grep -Fx 'author=Sidin Search' >/dev/null
+unzip -p "$module" module.prop | grep -Fx 'author=sidinsearch' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'version=1.0.0' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'versionCode=332' >/dev/null
 unzip -p "$module" META-INF/com/google/android/update-binary > "$tmp/update-binary"

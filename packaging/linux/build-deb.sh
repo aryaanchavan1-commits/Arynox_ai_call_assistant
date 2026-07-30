@@ -151,7 +151,7 @@ Section: comm
 Priority: optional
 Architecture: $arch
 Depends: nodejs (>= 20), python3, android-tools-adb, ffmpeg
-Maintainer: Sidin Search <sidinsearch.inbox@gmail.com>
+Maintainer: sidinsearch <siddhushinde788@gmail.com>
 Description: USB-only local cellular agent gateway
  Linux gateway daemon and stdio MCP boundary for an ADB-forwarded,
  loopback-only Android cellular gateway. Hardware mode remains fail-closed

@@ -5,8 +5,8 @@
   "description": "Secure daemon-backed Electron operations client for the USB-only AgentCall cellular agent gateway.",
   "homepage": "https://github.com/sidinsearch/AgentCall",
   "author": {
-    "name": "Sidin Search",
-    "email": "sidinsearch.inbox@gmail.com"
+    "name": "sidinsearch",
+    "email": "siddhushinde788@gmail.com"
   },
   "desktopName": "agentcall-desktop",
   "type": "module",
@@ -50,7 +50,7 @@
         "deb"
       ],
       "category": "Network",
-      "maintainer": "Sidin Search <sidinsearch.inbox@gmail.com>",
+      "maintainer": "sidinsearch <siddhushinde788@gmail.com>",
       "syncDesktopName": true,
       "icon": "build/icons",
       "artifactName": "agentcall-desktop-${version}-${arch}.${ext}"

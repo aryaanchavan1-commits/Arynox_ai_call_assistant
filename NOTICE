@@ -1,5 +1,5 @@
 AgentCall
-Copyright 2026 Sidin Search and AgentCall contributors
+Copyright 2026 sidinsearch and AgentCall contributors
 
 AgentCall-owned source code is licensed under AGPL-3.0-only as stated in
 LICENSE.
@@ -8,7 +8,7 @@ Historical provenance
 ---------------------
 The project began as an experimental derivative of the public
 pulpoff/gsm2sip repository. Its original authors retain authorship and
-copyright in their work. Sidin Search does not claim authorship of historical
+copyright in their work. sidinsearch does not claim authorship of historical
 commits or third-party code. The upstream repository did not contain an
 explicit license when it was imported; consequently, no upstream material is
 relicensed merely by this repository's LICENSE file. The private migration

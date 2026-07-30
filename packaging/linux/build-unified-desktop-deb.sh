@@ -65,7 +65,7 @@ Version: $version
 Architecture: amd64
 Section: comm
 Priority: optional
-Maintainer: Sidin Search <sidinsearch.inbox@gmail.com>
+Maintainer: sidinsearch <siddhushinde788@gmail.com>
 Homepage: https://github.com/sidinsearch/AgentCall
 Depends: libgtk-3-0, libnss3, libasound2, nodejs (>= 20), python3, android-tools-adb, ffmpeg
 Recommends: libappindicator3-1

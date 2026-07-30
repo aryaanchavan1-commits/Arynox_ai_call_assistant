@@ -87,7 +87,7 @@ id=agentcall-privileged
 name=AgentCall Privileged Telephony Bridge
 version=$version_name
 versionCode=$version_code
-author=Sidin Search
+author=sidinsearch
 summary=Matched AgentCall APK with package-scoped activation for USB-only cellular audio
 description=Refreshes the matched AgentCall package, preserves app data and the dialer role, and grants only its declared protected telephony-audio permissions.
 EOF

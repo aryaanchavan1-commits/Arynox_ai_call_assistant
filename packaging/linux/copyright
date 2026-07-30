@@ -3,7 +3,7 @@ Upstream-Name: AgentCall
 Source: https://github.com/sidinsearch/AgentCall
 
 Files: *
-Copyright: 2026 Sidin Search and AgentCall contributors
+Copyright: 2026 sidinsearch and AgentCall contributors
 License: AGPL-3.0-only
  The complete GNU Affero General Public License, Version 3 is shipped with this
  package as /usr/share/doc/agentcall-gatewayd/LICENSE.
