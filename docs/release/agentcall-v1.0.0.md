@@ -40,9 +40,11 @@ The functional runtime retains the physically qualified cellular media
 architecture. AgentCall 1.0.0 updates project identity, packaging metadata, and
 documentation without changing that call path.
 
-The distributed Android APK uses the qualification signing identity. The
-Windows installer is not Authenticode signed, and the Debian package is not
-published through a signed package repository. Privileged telephony audio
-remains qualified only for the documented POCO M2 Pro tuple. Read the full
+The distributed Android APK and matched Magisk module use the protected
+AgentCall production signing identity. Their embedded APK bytes are identical
+and are bound to the same canonical desktop trust manifest. The Windows
+installer is not Authenticode signed, and the Debian package is not published
+through a signed package repository. Privileged telephony audio remains
+qualified only for the documented POCO M2 Pro tuple. Read the full
 [release status](https://github.com/sidinsearch/AgentCall/blob/main/docs/RELEASE_STATUS.md)
 before installing the Magisk module.

@@ -22,11 +22,12 @@
 
 > [!IMPORTANT]
 > AgentCall v1.0.0 is the **first hardware-qualified release** for the
-> Xiaomi POCO M2 Pro reference setup. The Android artifact uses the
-> qualification/debug signer, the Windows installer is not Authenticode
-> signed, and the Debian package is not distributed through a signed
-> repository. Read the [release status](docs/RELEASE_STATUS.md) before
-> installing the privileged Android module.
+> Xiaomi POCO M2 Pro reference setup. The Android APK and matched Magisk
+> module use the protected AgentCall production signing identity. The Windows
+> installer is not Authenticode signed, and the Debian package is not
+> distributed through a signed repository. Read the
+> [release status](docs/RELEASE_STATUS.md) before installing the privileged
+> Android module.
 
 ## Overview
 
