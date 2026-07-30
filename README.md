@@ -23,7 +23,7 @@
 ![AgentCall Desktop and Android applications](screenshots/agentcall-showcase.png)
 
 > [!IMPORTANT]
-> AgentCall v1.0.0 is a **hardware-qualified first stable release** for the
+> AgentCall v1.0.0 is the **first hardware-qualified release** for the
 > Xiaomi POCO M2 Pro reference setup. The Android artifact uses the
 > qualification/debug signer, the Windows installer is not Authenticode
 > signed, and the Debian package is not distributed through a signed

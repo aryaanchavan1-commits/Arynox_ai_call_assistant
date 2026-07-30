@@ -1,6 +1,6 @@
 # AgentCall 1.0.0
 
-AgentCall 1.0.0 is the first stable, hardware-qualified release for the
+AgentCall 1.0.0 is the first hardware-qualified release for the
 hardware-qualified AgentCall stack. It ships matched Android, Magisk, Windows,
 and Debian artifacts from the same source revision.
 
