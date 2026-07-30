@@ -167,8 +167,8 @@ lossless PNG from the [`screenshots/`](screenshots/README.md) directory.
 
 <table>
   <tr>
-    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-gateway.png"><img src="screenshots/android/agentcall-readme-android-gateway.png" width="46%" alt="AgentCall Android desktop pairing and system readiness"></a><br><sub><strong>Gateway</strong> — pairing and device readiness</sub></td>
-    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-recordings.png"><img src="screenshots/android/agentcall-readme-android-recordings.png" width="46%" alt="AgentCall Android in-app recording player"></a><br><sub><strong>Recordings</strong> — playback, save, and deletion</sub></td>
+    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-gateway.png"><img src="screenshots/android/agentcall-readme-android-gateway.png" width="66%" alt="AgentCall Android desktop pairing and system readiness"></a><br><sub><strong>Gateway</strong> — pairing and device readiness</sub></td>
+    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-recordings.png"><img src="screenshots/android/agentcall-readme-android-recordings.png" width="66%" alt="AgentCall Android in-app recording player"></a><br><sub><strong>Recordings</strong> — playback, save, and deletion</sub></td>
   </tr>
 </table>
 
