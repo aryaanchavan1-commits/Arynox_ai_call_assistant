@@ -28,7 +28,8 @@ artifacts from one source revision.
 - `agentcall-desktop-1.0.0-amd64.deb` - Ubuntu/Debian x86-64 package.
 
 Install the APK and the exactly matched Magisk module together. Follow the
-[installation guide](../INSTALL.md) for the required reboot, default-dialer
+[installation guide](https://github.com/sidinsearch/AgentCall/blob/main/docs/INSTALL.md)
+for the required reboot, default-dialer
 selection, USB pairing, provider setup, and Hermes/OpenClaw MCP configuration.
 
 ## Qualification and signing
@@ -41,4 +42,5 @@ The distributed Android APK uses the qualification signing identity. The
 Windows installer is not Authenticode signed, and the Debian package is not
 published through a signed package repository. Privileged telephony audio
 remains qualified only for the documented POCO M2 Pro tuple. Read the full
-[release status](../RELEASE_STATUS.md) before installing the Magisk module.
+[release status](https://github.com/sidinsearch/AgentCall/blob/main/docs/RELEASE_STATUS.md)
+before installing the Magisk module.
