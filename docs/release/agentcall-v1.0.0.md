@@ -26,9 +26,6 @@ and Debian artifacts from the same source revision.
   Magisk module.
 - `agentcall-desktop-1.0.0-x64-setup.exe` - Windows x86-64 installer.
 - `agentcall-desktop-1.0.0-amd64.deb` - Ubuntu/Debian x86-64 package.
-- `SHA256SUMS` - SHA-256 checksums for the four installable artifacts.
-- `ARTIFACT-STATUS.txt` and `ANDROID-ROLLBACK-MANIFEST.txt` - Android build,
-  pairing, and rollback evidence.
 
 Install the APK and the exactly matched Magisk module together. Follow the
 [installation guide](../INSTALL.md) for the required reboot, default-dialer
