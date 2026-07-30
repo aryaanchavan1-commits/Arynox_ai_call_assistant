@@ -104,7 +104,6 @@ object GsmCallManager {
             }
             Call.STATE_ACTIVE -> {
                 Log.i(TAG, "GSM call active: ${com.callagent.gateway.usb.RedactingLog.redactPhone(number)}")
-                configureAudioBridge()
                 listener?.onGsmCallActive(call)
             }
         }
@@ -140,7 +139,6 @@ object GsmCallManager {
             }
             Call.STATE_ACTIVE -> {
                 Log.i(TAG, "GSM call active")
-                configureAudioBridge()
                 listener?.onGsmCallActive(call)
             }
             Call.STATE_DISCONNECTED -> {
@@ -209,7 +207,7 @@ object GsmCallManager {
     val MUSIC_VOL_PERCENT: Int get() = profile.musicVolPercent
 
     /** Configure audio for the cellular↔USB bridge using the active device profile. */
-    private fun configureAudioBridge() {
+    fun prepareActiveAudioRoute() {
         try {
             inCallService?.let { service ->
                 val audioManager = service.getSystemService(Context.AUDIO_SERVICE) as? AudioManager

@@ -472,6 +472,7 @@ class UsbGatewayService : Service() {
                 // startup and play as soon as the uplink becomes writable.
                 emitCallEvent("active", id, direction = if (outgoing) "outgoing" else null)
                 GatewayStateStore.update(this@UsbGatewayService, GatewayUiEvent.CallChanged(id, GatewayUiState.CallPhase.ACTIVE))
+                GsmCallManager.prepareActiveAudioRoute()
                 audioCoordinator?.onCall(id, active = true)
             }
 
@@ -491,6 +492,7 @@ class UsbGatewayService : Service() {
                 }
                 emitCallEvent(phase.name.lowercase(), id, direction = if (outgoing) "outgoing" else null)
                 GatewayStateStore.update(this@UsbGatewayService, GatewayUiEvent.CallChanged(id, phase))
+                if (phase == GatewayUiState.CallPhase.ACTIVE) GsmCallManager.prepareActiveAudioRoute()
                 audioCoordinator?.onCall(id, active = phase == GatewayUiState.CallPhase.ACTIVE)
             }
 

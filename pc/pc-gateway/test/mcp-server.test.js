@@ -577,7 +577,8 @@ test('Hermes field aliases and omitted cursors do not add repair turns or repeat
 
   const spoken = toolPayload(await handler.handle(call('speak', {
     call_id: 'call-1',
-    text: 'Thanks for telling me. I am checking that delay now.',
+    speechText: 'Thanks for telling me. I am checking that delay now.',
+    sequence: first.sequence,
   })));
   assert.equal(spoken.accepted, true);
   assert.match(gateway.calls.at(-1)[1].idempotencyKey, /^mcp-speak-[a-f0-9]{48}$/);
@@ -596,6 +597,51 @@ test('Hermes field aliases and omitted cursors do not add repair turns or repeat
   const next = toolPayload(await nextWait);
   assert.equal(next.sequence > first.sequence, true);
   assert.equal(next.text, 'Are you still there?');
+  handler.close();
+});
+
+test('an explicit end-call turn gets one protected farewell despite trailing STT fragments', async () => {
+  const gateway = fakeGateway();
+  const handler = new McpHandler(gateway, {
+    completeTurnSettleMs: 5,
+    incompleteTurnSettleMs: 100,
+  });
+  const waiting = handler.handle(call('wait_for_turn', {
+    callId: 'call-closing',
+    afterSequence: 0,
+    timeoutMs: 500,
+  }));
+  gateway.emit('event', {
+    event: 'transcript_final',
+    callId: 'call-closing',
+    speaker: 'remote',
+    complete: true,
+    text: 'No, no, okay, we just hang up this call.',
+  });
+  const closing = toolPayload(await waiting);
+  gateway.emit('event', {
+    event: 'transcript_final',
+    callId: 'call-closing',
+    speaker: 'remote',
+    complete: false,
+    text: 'please',
+  });
+
+  const farewell = toolPayload(await handler.handle(call('speak', {
+    call_id: 'call-closing',
+    speech_text: 'Alright, thank you for your time. Goodbye.',
+    sequence: closing.sequence,
+  })));
+  assert.equal(farewell.accepted, true);
+  assert.deepEqual({
+    ...gateway.calls.at(-1)[1],
+    idempotencyKey: '[derived]',
+  }, {
+    callId: 'call-closing',
+    text: 'Alright, thank you for your time. Goodbye.',
+    interruptible: false,
+    idempotencyKey: '[derived]',
+  });
   handler.close();
 });
 

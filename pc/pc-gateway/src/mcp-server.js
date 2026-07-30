@@ -9,6 +9,7 @@ import {
   contextualAcknowledgement,
   contextualAcknowledgementFollowUp,
 } from './conversation-phrases.js';
+import { isHangupIntent } from './conversation-turn-policy.js';
 import { rpcSocketFromEnv } from './runtime-config.js';
 
 export {
@@ -345,6 +346,7 @@ export const TOOLS = Object.freeze([
       number: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },
       openingText: { type: 'string', minLength: 7, maxLength: 1_200 },
       opening: { type: 'string', minLength: 7, maxLength: 1_200 },
+      natural_opening: { type: 'string', minLength: 7, maxLength: 1_200 },
       preparedReplies: {
         type: 'array',
         minItems: 1,
@@ -357,6 +359,14 @@ export const TOOLS = Object.freeze([
         maxItems: 4,
         items: { type: 'string', minLength: 3, maxLength: 240 },
       },
+      reply_options: {
+        type: 'array',
+        minItems: 1,
+        maxItems: 4,
+        items: { type: 'string', minLength: 3, maxLength: 240 },
+      },
+      recording_policy: { type: 'string', minLength: 1, maxLength: 256 },
+      recorded_consent: { type: 'boolean', const: true },
       approved: { type: 'boolean', const: true },
       consent: {
         type: 'object',
@@ -407,9 +417,12 @@ export const TOOLS = Object.freeze([
       callId: CALL_ID_SCHEMA,
       call_id: CALL_ID_SCHEMA,
       text: RESPONSE_TEXT_SCHEMA,
+      speechText: RESPONSE_TEXT_SCHEMA,
+      speech_text: RESPONSE_TEXT_SCHEMA,
       respondingToSequence: { type: 'integer', minimum: 0 },
       responding_to_sequence: { type: 'integer', minimum: 0 },
-    }, ['text']),
+      sequence: { type: 'integer', minimum: 0 },
+    }, []),
   },
 ]);
 
@@ -432,8 +445,8 @@ function normalizeToolArguments(name, value) {
     idempotencyKey: ['idempotency_key'],
     ...(name === 'dial' ? {
       destination: ['number'],
-      openingText: ['opening'],
-      preparedReplies: ['responses'],
+      openingText: ['opening', 'natural_opening'],
+      preparedReplies: ['responses', 'reply_options'],
     } : {}),
     ...(['prepare_speech', 'wait_for_turn', 'answer', 'reject', 'hangup', 'send_dtmf', 'speak'].includes(name)
       ? { callId: ['call_id'] } : {}),
@@ -445,7 +458,10 @@ function normalizeToolArguments(name, value) {
       autoAcknowledge: ['auto_acknowledge'],
       autoPreparedReply: ['auto_prepared_reply'],
     } : {}),
-    ...(name === 'speak' ? { respondingToSequence: ['responding_to_sequence'] } : {}),
+    ...(name === 'speak' ? {
+      text: ['speechText', 'speech_text'],
+      respondingToSequence: ['responding_to_sequence', 'sequence'],
+    } : {}),
   };
   for (const [canonical, candidates] of Object.entries(aliases)) {
     for (const alias of candidates) {
@@ -459,6 +475,16 @@ function normalizeToolArguments(name, value) {
       delete normalized[alias];
     }
   }
+  if (name === 'dial' && normalized.consent === undefined
+      && normalized.recorded_consent === true
+      && boundedString(normalized.recording_policy, 256)) {
+    normalized.consent = {
+      recorded: true,
+      policy: normalized.recording_policy,
+    };
+  }
+  delete normalized.recorded_consent;
+  delete normalized.recording_policy;
   return { value: normalized };
 }
 
@@ -1295,18 +1321,25 @@ export class McpHandler {
       send_dtmf: () => this.gateway.sendDtmf(downstreamMutationArgs('send-dtmf', args), { signal }),
       speak: async () => {
         await this._cancelAcknowledgement(args.callId);
+        const respondingTurn = args.respondingToSequence === undefined ? null : this.turnEvents.findLast(
+          (event) => event.callId === args.callId
+            && event.status === 'turn'
+            && event.sequence === args.respondingToSequence,
+        );
+        const closingTurn = isHangupIntent(respondingTurn?.text);
         if (args.respondingToSequence !== undefined) {
           const latest = this.turnEvents.findLast(
             (event) => event.callId === args.callId && event.status === 'turn',
           );
-          if (this.pendingRemoteTurns.has(args.callId)
-              || (latest && latest.sequence > args.respondingToSequence)) {
+          if (!closingTurn && (this.pendingRemoteTurns.has(args.callId)
+              || (latest && latest.sequence > args.respondingToSequence))) {
             return { accepted: false, callId: args.callId, reason: 'stale caller turn' };
           }
         }
         return this.gateway.speak({
           callId: args.callId,
           text: args.text,
+          ...(closingTurn ? { interruptible: false } : {}),
           idempotencyKey: downstreamIdempotencyKey('speak', args),
         }, { signal });
       },
