@@ -37,7 +37,7 @@ const DEFAULT_TURN_WAIT_MS = 30_000;
 const MIN_TURN_WAIT_MS = 250;
 const MAX_TURN_WAIT_MS = 30_000;
 const DEFAULT_ACKNOWLEDGEMENT_DELAY_MS = 250;
-const DEFAULT_ACKNOWLEDGEMENT_FOLLOW_UP_DELAY_MS = 2_200;
+const DEFAULT_ACKNOWLEDGEMENT_FOLLOW_UP_DELAY_MS = 4_500;
 const DEFAULT_ACKNOWLEDGEMENT_INTERVAL_MS = 8_000;
 const DEFAULT_COMPLETE_TURN_SETTLE_MS = 250;
 const DEFAULT_INCOMPLETE_TURN_SETTLE_MS = 600;
@@ -340,7 +340,7 @@ export const TOOLS = Object.freeze([
   },
   {
     name: 'dial',
-    description: 'Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. Prefer destination, openingText, preparedReplies, approved, consent, and idempotencyKey; number, opening, responses, and snake_case idempotency_key are accepted for compatibility. AgentCall waits for the exact new call and live recording/media before playing the opening once. Supply one to four likely complete replies so AgentCall can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
+    description: 'Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. Prefer destination, openingText, preparedReplies, approved, consent, and idempotencyKey; number, opening, responses, and snake_case idempotency_key are accepted for compatibility. AgentCall waits for the exact new call and live recording/media before playing the opening exactly once. An accepted dial has already scheduled that opening: never call speak for the opening. Supply one to four likely complete replies so AgentCall can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
     inputSchema: mutationSchema({
       destination: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },
       number: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },
@@ -436,6 +436,22 @@ function isObject(value) {
 
 function boundedString(value, maxLength = 128) {
   return typeof value === 'string' && value.length > 0 && value.length <= maxLength;
+}
+
+function canonicalSpokenText(value) {
+  return typeof value === 'string'
+    ? value.toLocaleLowerCase().replace(/\s+/gu, ' ').trim()
+    : '';
+}
+
+function isAttentionTurn(value) {
+  const normalized = canonicalSpokenText(value)
+    .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
+  if (!normalized || normalized.split(' ').length > 6) return false;
+  return /\b(?:hello|hi|hey|are you there|can you hear me|are you listening|please speak|pick up the call)\b/u
+    .test(normalized);
 }
 
 function normalizeToolArguments(name, value) {
@@ -714,6 +730,7 @@ export class McpHandler {
     this.acknowledgementVariantByCall = new Map();
     this.preparedOpenings = new Map();
     this.preparedOpeningCallIds = new Set();
+    this.protectedOpeningTextByCall = new Map();
     this.preparedRepliesByCall = new Map();
     this.acknowledgementDelayMs = acknowledgementDelayMs;
     this.acknowledgementFollowUpDelayMs = acknowledgementFollowUpDelayMs;
@@ -937,6 +954,7 @@ export class McpHandler {
     if (pending?.timer) clearTimeout(pending.timer);
     this.preparedOpenings.delete(callId);
     this.preparedOpeningCallIds.delete(callId);
+    this.protectedOpeningTextByCall.delete(callId);
   }
 
   _schedulePreparedOpening(callId) {
@@ -995,7 +1013,7 @@ export class McpHandler {
           || /\b(?:yes|yeah|correct|right)\b/u.test(normalized)) return 'positive';
       return null;
     })();
-    if (!callerIntent) return null;
+    if (!callerIntent || callerIntent === 'closing') return null;
     const replyIntent = (text) => {
       const candidate = text.toLowerCase();
       if (/\b(?:goodbye|bye|pass that along|thank you)\b/u.test(candidate)) return 'closing';
@@ -1163,6 +1181,7 @@ export class McpHandler {
 
     if (boundedString(receipt.callId) && !this.preparedOpeningCallIds.has(receipt.callId)) {
       this.preparedOpeningCallIds.add(receipt.callId);
+      this.protectedOpeningTextByCall.set(receipt.callId, args.openingText);
       this.preparedOpenings.set(receipt.callId, {
         text: args.openingText,
         idempotencyKey: downstreamIdempotencyKey('protected-opening', {
@@ -1320,6 +1339,11 @@ export class McpHandler {
       hangup: () => this.gateway.hangup(downstreamMutationArgs('hangup', args), { signal }),
       send_dtmf: () => this.gateway.sendDtmf(downstreamMutationArgs('send-dtmf', args), { signal }),
       speak: async () => {
+        const protectedOpening = this.protectedOpeningTextByCall.get(args.callId);
+        if (protectedOpening
+            && canonicalSpokenText(protectedOpening) === canonicalSpokenText(args.text)) {
+          return { accepted: true, callId: args.callId };
+        }
         await this._cancelAcknowledgement(args.callId);
         const respondingTurn = args.respondingToSequence === undefined ? null : this.turnEvents.findLast(
           (event) => event.callId === args.callId
@@ -1331,8 +1355,8 @@ export class McpHandler {
           const latest = this.turnEvents.findLast(
             (event) => event.callId === args.callId && event.status === 'turn',
           );
-          if (!closingTurn && (this.pendingRemoteTurns.has(args.callId)
-              || (latest && latest.sequence > args.respondingToSequence))) {
+          if (!closingTurn && latest && latest.sequence > args.respondingToSequence
+              && !isAttentionTurn(latest.text)) {
             return { accepted: false, callId: args.callId, reason: 'stale caller turn' };
           }
         }

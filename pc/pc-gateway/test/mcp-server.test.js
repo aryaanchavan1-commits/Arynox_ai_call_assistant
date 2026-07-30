@@ -312,6 +312,12 @@ test('dial automatically plays its prepared opening once when outgoing media bec
   assert.equal(payload.callId, 'call-1');
   assert.equal(payload.nextAction, 'wait_for_turn');
   assert.equal(payload.afterSequence, 0);
+  const duplicate = toolPayload(await handler.handle(call('speak', {
+    callId: 'call-1',
+    text: `  ${args.openingText}  `,
+  })));
+  assert.deepEqual(duplicate, { accepted: true, callId: 'call-1' });
+  assert.equal(gateway.calls.filter(([name]) => name === 'speak').length, 0);
   gateway.emit('event', {
     event: 'active', callId: 'call-1', direction: 'outgoing', phase: 'active',
   });
@@ -749,13 +755,9 @@ test('wait_for_turn immediately plays one exact warmed reply for a strong expect
     complete: true, language: 'en', text: 'Okay, I will call back. Goodbye.',
   });
   const closing = toolPayload(await closingWait);
-  assert.equal(closing.preparedReplySpoken, true);
-  assert.equal(closing.preparedReplyText, preparedReplies[3]);
-  assert.deepEqual(gateway.calls.at(-1), ['speak', {
-    callId: 'call-1',
-    text: preparedReplies[3],
-    idempotencyKey: 'mcp-prepared-4-3',
-  }]);
+  assert.equal(closing.preparedReplySpoken, undefined);
+  assert.equal(closing.preparedReplyText, undefined);
+  assert.notEqual(gateway.calls.at(-1)?.[1]?.text, preparedReplies[3]);
   handler.close();
 });
 
@@ -1152,7 +1154,7 @@ test('contextual acknowledgement follow-up fills a slow model gap and stops befo
   handler.close();
 });
 
-test('speak rejects a stale generated reply when the caller has already started a newer turn', async () => {
+test('speak tolerates pending and attention noise but rejects a completed substantive newer turn', async () => {
   const gateway = fakeGateway();
   const handler = new McpHandler(gateway, { completeTurnSettleMs: 5, incompleteTurnSettleMs: 20 });
   gateway.emit('event', {
@@ -1166,22 +1168,49 @@ test('speak rejects a stale generated reply when the caller has already started 
 
   gateway.emit('event', {
     event: 'transcript_final', callId: 'call-stale', speaker: 'remote',
-    complete: true, text: 'What are you doing?',
+    complete: false, text: 'background',
   });
-  const stale = toolPayload(await handler.handle(call('speak', {
+  const pendingAccepted = toolPayload(await handler.handle(call('speak', {
     callId: 'call-stale',
     text: 'Anything interesting catching your attention?',
     respondingToSequence: first.sequence,
     idempotencyKey: 'stale-answer-1',
   })));
+  assert.equal(pendingAccepted.accepted, true);
+
+  gateway.emit('event', {
+    event: 'transcript_final', callId: 'call-stale', speaker: 'remote',
+    complete: true, text: 'Hello, are you there?',
+  });
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const attentionAccepted = toolPayload(await handler.handle(call('speak', {
+    callId: 'call-stale',
+    text: 'Yes, I am here and listening.',
+    respondingToSequence: first.sequence,
+    idempotencyKey: 'stale-answer-2',
+  })));
+  assert.equal(attentionAccepted.accepted, true);
+
+  const attention = toolPayload(await handler.handle(call('wait_for_turn', {
+    callId: 'call-stale', afterSequence: first.sequence, timeoutMs: 500,
+  })));
+  gateway.emit('event', {
+    event: 'transcript_final', callId: 'call-stale', speaker: 'remote',
+    complete: true, text: 'What are you doing?',
+  });
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const stale = toolPayload(await handler.handle(call('speak', {
+    callId: 'call-stale',
+    text: 'I am still answering the earlier topic.',
+    respondingToSequence: attention.sequence,
+    idempotencyKey: 'stale-answer-3',
+  })));
   assert.deepEqual(stale, {
     accepted: false, callId: 'call-stale', reason: 'stale caller turn',
   });
-  assert.equal(gateway.calls.length, 0);
 
-  await new Promise((resolve) => setTimeout(resolve, 10));
   const latest = toolPayload(await handler.handle(call('wait_for_turn', {
-    callId: 'call-stale', afterSequence: first.sequence, timeoutMs: 500,
+    callId: 'call-stale', afterSequence: attention.sequence, timeoutMs: 500,
   })));
   const accepted = toolPayload(await handler.handle(call('speak', {
     callId: 'call-stale',
@@ -1190,16 +1219,16 @@ test('speak rejects a stale generated reply when the caller has already started 
     idempotencyKey: 'fresh-answer-1',
   })));
   assert.equal(accepted.accepted, true);
-  assert.equal(gateway.calls.length, 1);
+  assert.equal(gateway.calls.length, 3);
   assert.deepEqual({
-    ...gateway.calls[0][1],
+    ...gateway.calls.at(-1)[1],
     idempotencyKey: '[derived]',
   }, {
     callId: 'call-stale',
     text: 'I am enjoying our conversation.',
     idempotencyKey: '[derived]',
   });
-  assert.match(gateway.calls[0][1].idempotencyKey, /^mcp-speak-[a-f0-9]{48}$/);
+  assert.match(gateway.calls.at(-1)[1].idempotencyKey, /^mcp-speak-[a-f0-9]{48}$/);
   handler.close();
 });
 
