@@ -20,7 +20,22 @@
   </p>
 </div>
 
-![AgentCall Desktop and Android applications](screenshots/agentcall-showcase.png)
+<table>
+  <tr>
+    <td width="68%" align="center">
+      <a href="screenshots/desktop/agentcall-readme-desktop-live.png">
+        <img src="screenshots/desktop/agentcall-readme-desktop-live.png" alt="AgentCall Desktop Live Call workspace">
+      </a>
+      <br><sub><strong>AgentCall Desktop</strong> — live cellular call control</sub>
+    </td>
+    <td width="32%" align="center">
+      <a href="screenshots/android/agentcall-readme-android-gateway.png">
+        <img src="screenshots/android/agentcall-readme-android-gateway.png" width="72%" alt="AgentCall Android Gateway screen">
+      </a>
+      <br><sub><strong>AgentCall Android</strong> — authenticated USB gateway</sub>
+    </td>
+  </tr>
+</table>
 
 > [!IMPORTANT]
 > AgentCall v1.0.0 is the **first hardware-qualified release** for the
