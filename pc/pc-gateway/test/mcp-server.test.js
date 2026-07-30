@@ -170,11 +170,11 @@ test('tools/list exposes exactly required strict schemas with no PCM surface', a
   assert.equal(/pcm|base64|payload|send_uplink|request_downlink_probe/i.test(JSON.stringify(response.result.tools)), false);
 });
 
-test('all mutation tools require a bounded nonempty idempotencyKey', async () => {
+test('mutation tools derive bounded downstream idempotency when an agent omits its key', async () => {
   const gateway = fakeGateway();
   const handler = new McpHandler(gateway);
   const cases = [
-    ['dial', { destination: '+15551234567' }],
+    ['dial', approvedDial({ idempotencyKey: undefined })],
     ['answer', { callId: 'call-1' }],
     ['reject', { callId: 'call-1' }],
     ['hangup', { callId: 'call-1' }],
@@ -182,9 +182,13 @@ test('all mutation tools require a bounded nonempty idempotencyKey', async () =>
   ];
   for (const [name, args] of cases) {
     const response = await handler.handle(call(name, args));
-    assert.equal(response.error.code, JSONRPC_ERROR.INVALID_PARAMS, name);
+    assert.equal(toolPayload(response).accepted, true, name);
   }
-  assert.equal(gateway.calls.length, 0);
+  const keys = gateway.calls
+    .filter(([name]) => ['dial', 'answer', 'reject', 'hangup', 'sendDtmf'].includes(name))
+    .map(([, args]) => args.idempotencyKey);
+  assert.equal(keys.length, 5);
+  assert.equal(keys.every((key) => /^mcp-[a-z-]+-[a-f0-9]{48}$/.test(key)), true);
 });
 
 test('unknown fields are rejected for every tool', async () => {
@@ -538,6 +542,61 @@ test('reused agent idempotency keys cannot collide across operations or differen
   assert.equal(keys.length, 4);
   assert.equal(new Set(keys).size, 4);
   assert.equal(keys.every((key) => /^mcp-[a-z-]+-[a-f0-9]{48}$/.test(key)), true);
+});
+
+test('Hermes field aliases and omitted cursors do not add repair turns or repeat caller turns', async () => {
+  const gateway = fakeGateway();
+  const handler = new McpHandler(gateway, {
+    completeTurnSettleMs: 5,
+    incompleteTurnSettleMs: 10,
+  });
+  const dialArgs = approvedDial();
+  const dial = toolPayload(await handler.handle(call('dial', {
+    number: dialArgs.destination,
+    opening: dialArgs.openingText,
+    responses: dialArgs.preparedReplies,
+    approved: true,
+    consent: dialArgs.consent,
+    idempotency_key: 'hermes-compatible-dial',
+  })));
+  assert.equal(dial.accepted, true);
+
+  const firstWait = handler.handle(call('wait_for_turn', {
+    call_id: 'call-1',
+    timeout_ms: 500,
+  }));
+  gateway.emit('event', {
+    event: 'transcript_final',
+    callId: 'call-1',
+    speaker: 'remote',
+    complete: true,
+    text: 'There is a noticeable delay.',
+  });
+  const first = toolPayload(await firstWait);
+  assert.equal(first.sequence, 1);
+
+  const spoken = toolPayload(await handler.handle(call('speak', {
+    call_id: 'call-1',
+    text: 'Thanks for telling me. I am checking that delay now.',
+  })));
+  assert.equal(spoken.accepted, true);
+  assert.match(gateway.calls.at(-1)[1].idempotencyKey, /^mcp-speak-[a-f0-9]{48}$/);
+
+  const nextWait = handler.handle(call('wait_for_turn', {
+    call_id: 'call-1',
+    timeout_ms: 500,
+  }));
+  gateway.emit('event', {
+    event: 'transcript_final',
+    callId: 'call-1',
+    speaker: 'remote',
+    complete: true,
+    text: 'Are you still there?',
+  });
+  const next = toolPayload(await nextWait);
+  assert.equal(next.sequence > first.sequence, true);
+  assert.equal(next.text, 'Are you still there?');
+  handler.close();
 });
 
 test('status and capabilities route with empty arguments', async () => {

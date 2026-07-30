@@ -466,9 +466,13 @@ class UsbGatewayService : Service() {
                 val id = GsmCallManager.activeCallId ?: return
                 val outgoing = GsmCallManager.isGatewayOutgoingCall(call)
                 if (outgoing) outgoingRecordingWatchdog?.onOutgoingCall(id)
-                audioCoordinator?.onCall(id, active = true)
+                // Publish ACTIVE before the synchronous Android audio-device open.
+                // The desktop recorder/realtime session is already pre-armed while
+                // dialing, so this lets the protected opening queue during bridge
+                // startup and play as soon as the uplink becomes writable.
                 emitCallEvent("active", id, direction = if (outgoing) "outgoing" else null)
                 GatewayStateStore.update(this@UsbGatewayService, GatewayUiEvent.CallChanged(id, GatewayUiState.CallPhase.ACTIVE))
+                audioCoordinator?.onCall(id, active = true)
             }
 
             override fun onGsmCallStateChanged(call: android.telecom.Call, state: Int) {
@@ -485,9 +489,9 @@ class UsbGatewayService : Service() {
                 if (outgoing && (phase == GatewayUiState.CallPhase.DIALING || phase == GatewayUiState.CallPhase.ACTIVE)) {
                     outgoingRecordingWatchdog?.onOutgoingCall(id)
                 }
-                audioCoordinator?.onCall(id, active = phase == GatewayUiState.CallPhase.ACTIVE)
                 emitCallEvent(phase.name.lowercase(), id, direction = if (outgoing) "outgoing" else null)
                 GatewayStateStore.update(this@UsbGatewayService, GatewayUiEvent.CallChanged(id, phase))
+                audioCoordinator?.onCall(id, active = phase == GatewayUiState.CallPhase.ACTIVE)
             }
 
             override fun onGsmCallEnded(call: android.telecom.Call) {

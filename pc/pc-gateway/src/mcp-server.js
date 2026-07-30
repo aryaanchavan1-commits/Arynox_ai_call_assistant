@@ -43,7 +43,7 @@ const DEFAULT_INCOMPLETE_TURN_SETTLE_MS = 600;
 const DEFAULT_FRAGMENT_TURN_SETTLE_MS = 900;
 const DEFAULT_DIAL_CORRELATION_TIMEOUT_MS = 5_000;
 const DEFAULT_DIAL_CORRELATION_POLL_MS = 25;
-const DEFAULT_OPENING_MEDIA_STABILIZATION_MS = 250;
+const DEFAULT_OPENING_MEDIA_STABILIZATION_MS = 50;
 const DEFAULT_OPENING_READY_TIMEOUT_MS = 5_000;
 const DEFAULT_OPENING_READY_POLL_MS = 50;
 const BOOLEAN = 'boolean';
@@ -288,8 +288,12 @@ function exactResourceParams(params) {
 function mutationSchema(properties, required) {
   return {
     type: 'object',
-    properties: { ...properties, idempotencyKey: ID_SCHEMA },
-    required: [...required, 'idempotencyKey'],
+    properties: {
+      ...properties,
+      idempotencyKey: ID_SCHEMA,
+      idempotency_key: ID_SCHEMA,
+    },
+    required,
     additionalProperties: false,
   };
 }
@@ -304,35 +308,50 @@ export const TOOLS = Object.freeze([
       type: 'object',
       properties: {
         afterSequence: { type: 'integer', minimum: 0 },
+        after_sequence: { type: 'integer', minimum: 0 },
         timeoutMs: { type: 'integer', minimum: MIN_TURN_WAIT_MS, maximum: MAX_TURN_WAIT_MS },
+        timeout_ms: { type: 'integer', minimum: MIN_TURN_WAIT_MS, maximum: MAX_TURN_WAIT_MS },
       },
-      required: ['afterSequence'],
+      required: [],
       additionalProperties: false,
     },
   },
   {
     name: 'wait_for_turn',
-    description: 'Use the exact camelCase fields callId and afterSequence. Wait efficiently for the next complete remote caller turn or call end. AgentCall immediately plays an exact warmed prepared reply when a strong caller-intent match exists; when preparedReplySpoken is true, do not call speak for that turn and immediately wait again. Pass autoPreparedReply false to disable this behavior. Otherwise, brief contextual acknowledgements may play while response generation is pending; pass autoAcknowledge false to disable them.',
+    description: 'Wait efficiently for the next complete remote caller turn or call end. Prefer callId and afterSequence; common snake_case aliases are accepted and an omitted cursor resumes after the last delivered turn. AgentCall immediately plays an exact warmed prepared reply when a strong caller-intent match exists; when preparedReplySpoken is true, do not call speak for that turn and immediately wait again. Pass autoPreparedReply false to disable this behavior. Otherwise, brief contextual acknowledgements may play while response generation is pending; pass autoAcknowledge false to disable them.',
     inputSchema: {
       type: 'object',
       properties: {
         callId: CALL_ID_SCHEMA,
+        call_id: CALL_ID_SCHEMA,
         afterSequence: { type: 'integer', minimum: 0 },
+        after_sequence: { type: 'integer', minimum: 0 },
         timeoutMs: { type: 'integer', minimum: MIN_TURN_WAIT_MS, maximum: MAX_TURN_WAIT_MS },
+        timeout_ms: { type: 'integer', minimum: MIN_TURN_WAIT_MS, maximum: MAX_TURN_WAIT_MS },
         autoAcknowledge: { type: 'boolean' },
+        auto_acknowledge: { type: 'boolean' },
         autoPreparedReply: { type: 'boolean' },
+        auto_prepared_reply: { type: 'boolean' },
       },
-      required: ['callId', 'afterSequence'],
+      required: [],
       additionalProperties: false,
     },
   },
   {
     name: 'dial',
-    description: 'Use exactly the camelCase fields destination, openingText, preparedReplies, approved, consent, and idempotencyKey; do not use number, opening, responses, or snake_case aliases. Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. AgentCall waits for the exact new call and live recording/media before playing the opening once. Supply one to four likely complete replies so AgentCall can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
+    description: 'Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. Prefer destination, openingText, preparedReplies, approved, consent, and idempotencyKey; number, opening, responses, and snake_case idempotency_key are accepted for compatibility. AgentCall waits for the exact new call and live recording/media before playing the opening once. Supply one to four likely complete replies so AgentCall can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
     inputSchema: mutationSchema({
       destination: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },
+      number: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },
       openingText: { type: 'string', minLength: 7, maxLength: 1_200 },
+      opening: { type: 'string', minLength: 7, maxLength: 1_200 },
       preparedReplies: {
+        type: 'array',
+        minItems: 1,
+        maxItems: 4,
+        items: { type: 'string', minLength: 3, maxLength: 240 },
+      },
+      responses: {
         type: 'array',
         minItems: 1,
         maxItems: 4,
@@ -348,7 +367,7 @@ export const TOOLS = Object.freeze([
         required: ['recorded', 'policy'],
         additionalProperties: false,
       },
-    }, ['destination', 'openingText', 'preparedReplies', 'approved', 'consent']),
+    }, ['approved', 'consent']),
   },
   {
     name: 'prepare_speech',
@@ -357,6 +376,7 @@ export const TOOLS = Object.freeze([
       type: 'object',
       properties: {
         callId: CALL_ID_SCHEMA,
+        call_id: CALL_ID_SCHEMA,
         texts: {
           type: 'array',
           minItems: 1,
@@ -364,29 +384,32 @@ export const TOOLS = Object.freeze([
           items: { type: 'string', minLength: 3, maxLength: 240 },
         },
       },
-      required: ['callId', 'texts'],
+      required: ['texts'],
       additionalProperties: false,
     },
   },
-  { name: 'answer', description: 'Answer a call.', inputSchema: mutationSchema({ callId: CALL_ID_SCHEMA }, ['callId']) },
-  { name: 'reject', description: 'Reject a call.', inputSchema: mutationSchema({ callId: CALL_ID_SCHEMA }, ['callId']) },
-  { name: 'hangup', description: 'End a call.', inputSchema: mutationSchema({ callId: CALL_ID_SCHEMA }, ['callId']) },
+  { name: 'answer', description: 'Answer a call.', inputSchema: mutationSchema({ callId: CALL_ID_SCHEMA, call_id: CALL_ID_SCHEMA }, []) },
+  { name: 'reject', description: 'Reject a call.', inputSchema: mutationSchema({ callId: CALL_ID_SCHEMA, call_id: CALL_ID_SCHEMA }, []) },
+  { name: 'hangup', description: 'End a call.', inputSchema: mutationSchema({ callId: CALL_ID_SCHEMA, call_id: CALL_ID_SCHEMA }, []) },
   {
     name: 'send_dtmf',
     description: 'Send DTMF digits to a call.',
     inputSchema: mutationSchema({
       callId: CALL_ID_SCHEMA,
+      call_id: CALL_ID_SCHEMA,
       digits: { type: 'string', minLength: 1, maxLength: 32, pattern: '^[0-9*#A-D]+$' },
-    }, ['callId', 'digits']),
+    }, ['digits']),
   },
   {
     name: 'speak',
-    description: 'Use exactly the camelCase fields callId, text, respondingToSequence, and idempotencyKey; do not use call_id or snake_case aliases. Speak one complete natural response into the matching active consented call. Pass the wait_for_turn sequence so a response is rejected instead of speaking over a newer caller turn.',
+    description: 'Speak one complete natural response into the matching active consented call. Prefer callId, text, respondingToSequence, and idempotencyKey; common snake_case aliases are accepted and an omitted sequence is tied to the last delivered caller turn. Pass the wait_for_turn sequence so a response is rejected instead of speaking over a newer caller turn.',
     inputSchema: mutationSchema({
       callId: CALL_ID_SCHEMA,
+      call_id: CALL_ID_SCHEMA,
       text: RESPONSE_TEXT_SCHEMA,
       respondingToSequence: { type: 'integer', minimum: 0 },
-    }, ['callId', 'text']),
+      responding_to_sequence: { type: 'integer', minimum: 0 },
+    }, ['text']),
   },
 ]);
 
@@ -400,6 +423,43 @@ function isObject(value) {
 
 function boundedString(value, maxLength = 128) {
   return typeof value === 'string' && value.length > 0 && value.length <= maxLength;
+}
+
+function normalizeToolArguments(name, value) {
+  if (!isObject(value)) return { value };
+  const normalized = { ...value };
+  const aliases = {
+    idempotencyKey: ['idempotency_key'],
+    ...(name === 'dial' ? {
+      destination: ['number'],
+      openingText: ['opening'],
+      preparedReplies: ['responses'],
+    } : {}),
+    ...(['prepare_speech', 'wait_for_turn', 'answer', 'reject', 'hangup', 'send_dtmf', 'speak'].includes(name)
+      ? { callId: ['call_id'] } : {}),
+    ...(['wait_for_incoming_call', 'wait_for_turn'].includes(name) ? {
+      afterSequence: ['after_sequence'],
+      timeoutMs: ['timeout_ms'],
+    } : {}),
+    ...(name === 'wait_for_turn' ? {
+      autoAcknowledge: ['auto_acknowledge'],
+      autoPreparedReply: ['auto_prepared_reply'],
+    } : {}),
+    ...(name === 'speak' ? { respondingToSequence: ['responding_to_sequence'] } : {}),
+  };
+  for (const [canonical, candidates] of Object.entries(aliases)) {
+    for (const alias of candidates) {
+      if (!Object.hasOwn(normalized, alias)) continue;
+      if (Object.hasOwn(normalized, canonical)
+          && JSON.stringify(canonicalValue(normalized[canonical]))
+            !== JSON.stringify(canonicalValue(normalized[alias]))) {
+        return { value: normalized, problem: `conflicting ${canonical} aliases` };
+      }
+      if (!Object.hasOwn(normalized, canonical)) normalized[canonical] = normalized[alias];
+      delete normalized[alias];
+    }
+  }
+  return { value: normalized };
 }
 
 function canonicalValue(value) {
@@ -522,7 +582,9 @@ function validateArguments(name, value) {
     }
     return null;
   }
-  if (!boundedString(value.idempotencyKey)) return 'idempotencyKey must be a nonempty string up to 128 characters';
+  if (value.idempotencyKey !== undefined && !boundedString(value.idempotencyKey)) {
+    return 'idempotencyKey must be a nonempty string up to 128 characters when supplied';
+  }
   if (name === 'dial') {
     if (!E164_RE.test(value.destination)) return 'destination must be strict E.164';
     if (value.approved !== true) return 'manual approval is required';
@@ -612,7 +674,9 @@ export class McpHandler {
     this.turnSequence = 0;
     this.turnEvents = [];
     this.turnWaiters = new Set();
+    this.waitCursorByCall = new Map();
     this.incomingSequence = 0;
+    this.incomingWaitCursor = 0;
     this.incomingEvents = [];
     this.incomingWaiters = new Set();
     this.pendingRemoteTurns = new Map();
@@ -1180,7 +1244,20 @@ export class McpHandler {
     if (!isObject(params) || typeof params.name !== 'string') {
       return error(id, JSONRPC_ERROR.INVALID_PARAMS, 'invalid tools/call params');
     }
-    const args = params.arguments ?? {};
+    const normalized = normalizeToolArguments(params.name, params.arguments ?? {});
+    if (normalized.problem) return error(id, JSONRPC_ERROR.INVALID_PARAMS, normalized.problem);
+    const args = normalized.value;
+    if (params.name === 'wait_for_incoming_call' && args.afterSequence === undefined) {
+      args.afterSequence = this.incomingWaitCursor;
+    }
+    if (params.name === 'wait_for_turn' && args.afterSequence === undefined
+        && boundedString(args.callId)) {
+      args.afterSequence = this.waitCursorByCall.get(args.callId) ?? 0;
+    }
+    if (params.name === 'speak' && args.respondingToSequence === undefined
+        && boundedString(args.callId) && this.waitCursorByCall.has(args.callId)) {
+      args.respondingToSequence = this.waitCursorByCall.get(args.callId);
+    }
     const problem = validateArguments(params.name, args);
     if (problem) return error(id, JSONRPC_ERROR.INVALID_PARAMS, problem);
 
@@ -1241,6 +1318,15 @@ export class McpHandler {
           Object.assign(new Error('invalid RPC response'), { code: 'INVALID_RPC_RESPONSE' }),
         ) };
       }
+      if (params.name === 'wait_for_turn' && Number.isSafeInteger(receipt.sequence)) {
+        this.waitCursorByCall.set(
+          args.callId,
+          Math.max(this.waitCursorByCall.get(args.callId) ?? 0, receipt.sequence),
+        );
+      }
+      if (params.name === 'wait_for_incoming_call' && Number.isSafeInteger(receipt.sequence)) {
+        this.incomingWaitCursor = Math.max(this.incomingWaitCursor, receipt.sequence);
+      }
       return { jsonrpc: '2.0', id, result: callToolResult(receipt) };
     } catch (problem) {
       return { jsonrpc: '2.0', id, result: failedToolResult(problem) };
@@ -1257,6 +1343,7 @@ export class McpHandler {
     this.pendingRemoteTurns.clear();
     this.lastRemoteTurnByCall.clear();
     this.interruptedAgentByCall.clear();
+    this.waitCursorByCall.clear();
     this.preparedRepliesByCall.clear();
     for (const waiter of [...this.turnWaiters]) waiter.resolve({
       status: 'ended', callId: waiter.callId, sequence: waiter.afterSequence,
