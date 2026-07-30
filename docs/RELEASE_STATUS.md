@@ -24,7 +24,7 @@ app-store, Authenticode, or signed-repository artifacts.
 
 ### Automated
 
-- Gateway and MCP: 441 tests pass on Linux with 0 failures; 436 pass and 5
+- Gateway and MCP: 442 tests pass on Linux with 0 failures; 437 pass and 5
   platform-specific skips on Windows.
 - Desktop: 108 tests and syntax checks pass on Windows and Linux.
 - Android: unit tests, lint, manifest binding, and debug APK assembly are part

@@ -8,7 +8,7 @@
     <a href="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml"><img src="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml/badge.svg?branch=main" alt="Verify status"></a>
     <a href="https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/release-v1.0.0-00A896.svg" alt="AgentCall v1.0.0"></a>
     <a href="docs/RELEASE_STATUS.md"><img src="https://img.shields.io/badge/status-hardware--qualified-00A896.svg" alt="Hardware-qualified"></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--only-2563EB.svg" alt="GNU AGPL v3.0 only"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-2563EB.svg" alt="AGPL 3.0"></a>
   </p>
 
   <p>

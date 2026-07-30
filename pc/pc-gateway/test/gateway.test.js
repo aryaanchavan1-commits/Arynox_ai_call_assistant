@@ -1293,6 +1293,43 @@ test('transport loss clears pending outgoing consent before an unrelated later d
   assert.equal(gateway.status().recording.active, false);
 });
 
+test('outgoing dial reservation expires when Android never reports a matching call', async () => {
+  let expire;
+  const timer = { unref() {} };
+  const cleared = [];
+  const { gateway, device } = runningGateway({
+    policy: {
+      dialEnabled: true,
+      requireManualApproval: true,
+      allowNumbers: [DESTINATION],
+      destinationCooldownMs: 0,
+    },
+    outgoingDialStartTimeoutMs: 25,
+    setOutgoingDialTimer: (callback, delay) => {
+      assert.equal(delay, 25);
+      expire = callback;
+      return timer;
+    },
+    clearOutgoingDialTimer: (value) => cleared.push(value),
+  });
+  const dial = (idempotencyKey) => gateway.dial({
+    destination: DESTINATION,
+    idempotencyKey,
+    approved: true,
+    consent: { recorded: true, policy: 'authorized live-talk test' },
+  });
+
+  assert.equal((await dial('recorded-dial-timeout-1')).accepted, true);
+  assert.deepEqual(await dial('recorded-dial-timeout-blocked'), {
+    accepted: false,
+    reason: 'recording unavailable',
+  });
+  expire();
+  assert.equal((await dial('recorded-dial-timeout-2')).accepted, true);
+  assert.equal(device.controls.length, 2);
+  assert.deepEqual(cleared, [timer]);
+});
+
 test('duplicate outgoing dialing events consume one pending approved recording owner', async () => {
   let starts = 0;
   const recorder = { ready: true, appendEvent: async () => {}, finalize: async () => ({ complete: true }) };

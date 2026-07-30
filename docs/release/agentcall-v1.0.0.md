@@ -18,6 +18,8 @@ artifacts from one source revision.
   in the integration gallery.
 - Automated dependency-update branches are disabled so the repository retains
   its deliberate single-branch workflow.
+- A bounded outgoing-call watchdog releases recording ownership if Android
+  never reports the expected call, so a failed launch cannot block later calls.
 
 ## Downloads
 

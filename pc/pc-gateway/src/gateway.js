@@ -15,6 +15,7 @@ const TOOL_NAMES = Object.freeze([
   'dial', 'prepare_speech', 'answer', 'reject', 'hangup', 'send_dtmf', 'speak',
 ]);
 const DEFAULT_RECORDING_SYNC_RETRY_DELAYS_MS = Object.freeze([2_000, 5_000, 10_000, 30_000]);
+const DEFAULT_OUTGOING_DIAL_START_TIMEOUT_MS = 15_000;
 
 function parseJsonFrame(frame) {
   try {
@@ -58,6 +59,14 @@ export class Gateway extends EventEmitter {
         || this.commandResultTimeoutMs < 1 || this.commandResultTimeoutMs > 120_000) {
       throw new Error('command result timeout is invalid');
     }
+    this.outgoingDialStartTimeoutMs = options.outgoingDialStartTimeoutMs
+      ?? DEFAULT_OUTGOING_DIAL_START_TIMEOUT_MS;
+    if (!Number.isInteger(this.outgoingDialStartTimeoutMs)
+        || this.outgoingDialStartTimeoutMs < 1 || this.outgoingDialStartTimeoutMs > 120_000) {
+      throw new Error('outgoing dial start timeout is invalid');
+    }
+    this.setOutgoingDialTimer = options.setOutgoingDialTimer ?? setTimeout;
+    this.clearOutgoingDialTimer = options.clearOutgoingDialTimer ?? clearTimeout;
     this.policy = options.policy instanceof Policy
       ? options.policy
       : new Policy({ ...(options.policy ?? {}), redactionSalt: this.idempotencySalt });
@@ -117,6 +126,13 @@ export class Gateway extends EventEmitter {
       droppedSends: 0,
     };
     this._bindDeviceEvents();
+  }
+
+  _takePendingOutgoingRecording(expected = this.pendingOutgoingRecording) {
+    if (!expected || this.pendingOutgoingRecording !== expected) return null;
+    this.pendingOutgoingRecording = null;
+    if (expected.timer !== null) this.clearOutgoingDialTimer(expected.timer);
+    return expected;
   }
 
   get idempotencySize() {
@@ -271,8 +287,7 @@ export class Gateway extends EventEmitter {
         && value.direction === 'outgoing'
         && typeof value.callId === 'string' && CALL_ID_RE.test(value.callId)
         && this.pendingOutgoingRecording) {
-      const pending = this.pendingOutgoingRecording;
-      this.pendingOutgoingRecording = null;
+      const pending = this._takePendingOutgoingRecording();
       if (this.currentCall?.callId === value.callId) {
         this.currentCall = {
           ...this.currentCall,
@@ -416,7 +431,7 @@ export class Gateway extends EventEmitter {
     const callId = this.activeRecordingCallId;
     const recorder = this.activeRecorder;
     const realtime = this.activeRealtime;
-    this.pendingOutgoingRecording = null;
+    this._takePendingOutgoingRecording();
     this.currentCall = null;
     if (!recorder || !callId || this.recordingTeardownPending) return;
     this.recordingTeardownPending = true;
@@ -841,15 +856,21 @@ export class Gateway extends EventEmitter {
         this.metrics.commandsDenied++;
         return { accepted: false, reason: policyDecision.reason, destination: policyDecision.destination };
       }
-      this.pendingOutgoingRecording = {
+      const pending = {
         consent: structuredClone(consent), idempotencyKey,
         sessionId: `outgoing-${idempotencyKey}`, provider: 'realtime',
         displayNumber: destination,
+        timer: null,
       };
+      this.pendingOutgoingRecording = pending;
+      pending.timer = this.setOutgoingDialTimer(() => {
+        this._takePendingOutgoingRecording(pending);
+      }, this.outgoingDialStartTimeoutMs);
+      pending.timer?.unref?.();
       try {
         await this._sendControl({ command: 'dial', destination, idempotencyKey });
       } catch (error) {
-        this.pendingOutgoingRecording = null;
+        this._takePendingOutgoingRecording(pending);
         throw error;
       }
       return { accepted: true, destination: redactPhoneNumber(destination, this.idempotencySalt) };
@@ -1036,7 +1057,7 @@ export class Gateway extends EventEmitter {
     try {
       await this.recordingWork;
       await this.phoneDataWork;
-      this.pendingOutgoingRecording = null;
+      this._takePendingOutgoingRecording();
       this.currentCall = null;
       if (this.activeRecorder) {
         const recorder = this.activeRecorder;
