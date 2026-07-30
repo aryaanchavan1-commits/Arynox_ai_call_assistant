@@ -1320,6 +1320,10 @@ export async function runStdio(gateway, input = process.stdin, output = process.
       }
     }
     if (!discarding && pending.length > 0) dispatch(pending);
+    await Promise.race([
+      Promise.allSettled([...tasks]),
+      new Promise((resolve) => setTimeout(resolve, 100)),
+    ]);
     for (const controller of controllers) controller.abort();
     await Promise.race([
       Promise.allSettled([...tasks]),

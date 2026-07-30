@@ -114,6 +114,30 @@ test('stdio runner starts and stops daemon event stream with its lifecycle', asy
   assert.deepEqual(lifecycle, ['start', 'stop']);
 });
 
+test('stdio drains bounded in-flight requests before treating input EOF as shutdown', async () => {
+  const gateway = fakeGateway();
+  gateway.status = ({ signal } = {}) => new Promise((resolve, reject) => {
+    const timer = setTimeout(() => resolve({ state: 'running' }), 15);
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(new Error('status aborted'));
+    }, { once: true });
+  });
+  const output = new PassThrough();
+  let text = '';
+  output.setEncoding('utf8');
+  output.on('data', (chunk) => { text += chunk; });
+  const input = Readable.from([
+    `${JSON.stringify(call('status', {}, 93))}\n`,
+  ]);
+
+  await runStdio(gateway, input, output);
+  const response = JSON.parse(text.trim());
+  assert.equal(response.id, 93);
+  assert.equal(response.result.isError, false);
+  assert.equal(JSON.parse(response.result.content[0].text).state, 'running');
+});
+
 test('stdio treats an output EPIPE as a closed client without crashing', async () => {
   const output = new Writable({
     write(_chunk, _encoding, _callback) {
