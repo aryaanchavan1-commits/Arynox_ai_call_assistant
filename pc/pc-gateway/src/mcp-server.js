@@ -94,6 +94,8 @@ const PUBLIC_REASON = oneOf(
   'dial disabled by default', 'emergency destination blocked', 'destination denied',
   'destination not explicitly allowed', 'premium destination blocked', 'international destination blocked',
   'manual approval required', 'destination cooldown active', 'global dial rate exceeded',
+  'operation aborted', 'gateway unavailable', 'gateway timed out', 'gateway request failed',
+  'invalid gateway response',
 );
 const CALL_HISTORY_RECEIPT = Object.freeze({
   callId: identifier(), startedAt: timestamp, endedAt: timestamp, direction: CALL_DIRECTION,
@@ -415,11 +417,31 @@ function publicReceipt(name, value) {
   return schemaValue(value, schema);
 }
 
-function callToolResult(value) {
+function callToolResult(value, isError = false) {
   return {
     content: [{ type: 'text', text: JSON.stringify(value) }],
-    isError: false,
+    isError,
   };
+}
+
+function publicGatewayFailure(problem) {
+  const code = String(problem?.code ?? '').toUpperCase();
+  const message = String(problem?.message ?? '').toLowerCase();
+  if (code === 'ABORT_ERR' || message.includes('aborted')) return 'operation aborted';
+  if (code === 'ETIMEDOUT' || message.includes('timed out')) return 'gateway timed out';
+  if (['ENOENT', 'ECONNREFUSED', 'ECONNRESET', 'EPIPE'].includes(code)
+      || message.includes('connection closed') || message.includes('socket hang up')) {
+    return 'gateway unavailable';
+  }
+  if (code === 'INVALID_RPC_RESPONSE' || message.includes('invalid rpc response')
+      || message.includes('response id mismatch') || message.includes('response too large')) {
+    return 'invalid gateway response';
+  }
+  return 'gateway request failed';
+}
+
+function failedToolResult(problem) {
+  return callToolResult({ accepted: false, reason: publicGatewayFailure(problem) }, true);
 }
 
 function validateArguments(name, value) {
@@ -1184,8 +1206,17 @@ export class McpHandler {
         }, { signal });
       },
     };
-    const receipt = publicReceipt(params.name, await methods[params.name]());
-    return { jsonrpc: '2.0', id, result: callToolResult(receipt) };
+    try {
+      const receipt = publicReceipt(params.name, await methods[params.name]());
+      if (receipt === undefined) {
+        return { jsonrpc: '2.0', id, result: failedToolResult(
+          Object.assign(new Error('invalid RPC response'), { code: 'INVALID_RPC_RESPONSE' }),
+        ) };
+      }
+      return { jsonrpc: '2.0', id, result: callToolResult(receipt) };
+    } catch (problem) {
+      return { jsonrpc: '2.0', id, result: failedToolResult(problem) };
+    }
   }
 
   close() {
@@ -1210,15 +1241,36 @@ export class McpHandler {
 
 export async function runStdio(gateway, input = process.stdin, output = process.stdout) {
   let writeQueue = Promise.resolve();
+  let outputFailed = false;
+  const onOutputError = () => { outputFailed = true; };
+  output.on?.('error', onOutputError);
   const write = (message) => {
+    if (outputFailed || output.destroyed || output.writableEnded) return;
     let text = JSON.stringify(message);
     if (Buffer.byteLength(text) > MAX_LINE_BYTES) {
       text = JSON.stringify(error(validRequestId(message?.id) ? (message.id ?? null) : null,
         JSONRPC_ERROR.INTERNAL_ERROR, 'response too large'));
     }
-    writeQueue = writeQueue.then(() => new Promise((resolve, reject) => {
-      output.write(`${text}\n`, (problem) => problem ? reject(problem) : resolve());
-    })).catch(() => {});
+    writeQueue = writeQueue.then(() => new Promise((resolve) => {
+      if (outputFailed || output.destroyed || output.writableEnded) {
+        resolve();
+        return;
+      }
+      let settled = false;
+      const finish = (problem) => {
+        if (settled) return;
+        settled = true;
+        output.off?.('error', finish);
+        if (problem) outputFailed = true;
+        resolve();
+      };
+      output.once?.('error', finish);
+      try {
+        output.write(`${text}\n`, finish);
+      } catch (problem) {
+        finish(problem);
+      }
+    }));
   };
   const handler = new McpHandler(gateway, { notify: write });
   const controllers = new Set();
@@ -1278,6 +1330,7 @@ export async function runStdio(gateway, input = process.stdin, output = process.
     for (const controller of controllers) controller.abort();
     handler.close();
     gateway.stopEvents?.();
+    output.off?.('error', onOutputError);
   }
 }
 

@@ -7,7 +7,7 @@ import { EventEmitter, once } from 'node:events';
 import net from 'node:net';
 import { randomUUID } from 'node:crypto';
 
-import { GatewayRpcClient, GatewayRpcServer } from '../src/gateway-rpc.js';
+import { GatewayRpcClient, GatewayRpcError, GatewayRpcServer } from '../src/gateway-rpc.js';
 
 function fakeGateway() {
   const gateway = new EventEmitter();
@@ -360,6 +360,43 @@ test('RPC rejects binary-shaped and oversized request data', async (t) => {
   await assert.rejects(client.call('dial', { destination: 'x'.repeat(70_000) }), /request too large/);
 });
 
+test('RPC replaces unexpected gateway exception details with a structured safe failure', async (t) => {
+  const { client, gateway } = await fixture(t);
+  gateway.dial = async () => {
+    throw new Error('token=private-value at /etc/agentcall/gateway.env');
+  };
+  await assert.rejects(client.dial({
+    destination: '+155****0100',
+    idempotencyKey: 'safe-error',
+    approved: true,
+    consent: { recorded: true, policy: 'test fixture explicit consent' },
+  }), (problem) => {
+    assert.ok(problem instanceof GatewayRpcError);
+    assert.equal(problem.code, 'GATEWAY_OPERATION_FAILED');
+    assert.equal(problem.message, 'gateway operation failed');
+    assert.doesNotMatch(problem.message, /private|token|\/etc/i);
+    return true;
+  });
+});
+
+test('RPC rejects malformed or unrecognized structured errors without reflecting their text', async (t) => {
+  const socketPath = await rawServerFixture(t, (socket) => {
+    socket.once('data', (chunk) => {
+      const request = JSON.parse(String(chunk).trim());
+      socket.end(`${JSON.stringify({
+        id: request.id,
+        error: { code: 'MADE_UP', message: 'secret=/private/path' },
+      })}\n`);
+    });
+  });
+  await assert.rejects(new GatewayRpcClient({ socketPath, timeoutMs: 500 }).status(), (problem) => {
+    assert.ok(problem instanceof GatewayRpcError);
+    assert.equal(problem.code, 'GATEWAY_OPERATION_FAILED');
+    assert.equal(problem.message, 'gateway operation failed');
+    return true;
+  });
+});
+
 async function rawServerFixture(t, respond) {
   const dir = await mkdtemp(join(tmpdir(), 'agentcall-raw-rpc-'));
   const socketPath = process.platform === 'win32'
@@ -408,6 +445,21 @@ test('RPC call rejects a response with the wrong correlation id', async (t) => {
   });
   const client = new GatewayRpcClient({ socketPath, timeoutMs: 500 });
   await assert.rejects(client.status(), /response id mismatch/i);
+});
+
+test('RPC call rejects ambiguous and widened response envelopes', async (t) => {
+  for (const payload of [
+    { id: 1, result: { state: 'forged' }, extra: true },
+    { id: 1, result: { state: 'forged' }, error: { code: 'GATEWAY_OPERATION_FAILED', message: 'gateway operation failed' } },
+  ]) {
+    const socketPath = await rawServerFixture(t, (socket) => {
+      socket.once('data', () => socket.end(`${JSON.stringify(payload)}\n`));
+    });
+    await assert.rejects(
+      new GatewayRpcClient({ socketPath, timeoutMs: 500 }).status(),
+      /invalid RPC response/i,
+    );
+  }
 });
 
 test('RPC call supports AbortSignal cancellation with deterministic teardown', async (t) => {

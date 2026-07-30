@@ -73,7 +73,7 @@ test('local control plane remains useful offline and denies every live phone act
     ['sendDtmf', { callId: 'call-1', digits: '1', idempotencyKey: 'offline-dtmf' }],
     ['speak', { callId: 'call-1', text: 'hello', idempotencyKey: 'offline-speak' }],
   ]) {
-    assert.deepEqual(await control[method](args), { accepted: false, reason: 'phone_not_connected' });
+    assert.deepEqual(await control[method](args), { accepted: false, reason: 'phone disconnected' });
   }
 });
 
@@ -142,7 +142,7 @@ test('zero-touch gatewayd binds RPC and stays running when no phone is connected
   assert.equal(runtime.gateway, exposed);
   assert.deepEqual(actions.slice(0, 2), ['rpc:start', 'adb:no-phone']);
   assert.deepEqual(exposed.status().setup, { stage: 'WAITING_FOR_PHONE', reasonCode: 'phone_not_connected' });
-  assert.equal((await exposed.dial({})).reason, 'phone_not_connected');
+  assert.equal((await exposed.dial({})).reason, 'phone disconnected');
   await runtime.stop();
   assert.equal(actions.includes('rpc:stop'), true);
 });

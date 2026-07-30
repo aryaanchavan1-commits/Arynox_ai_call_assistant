@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import { EventEmitter } from 'node:events';
 import { fileURLToPath } from 'node:url';
-import { PassThrough, Readable } from 'node:stream';
+import { PassThrough, Readable, Writable } from 'node:stream';
 
 import {
   contextualAcknowledgement,
@@ -72,6 +72,14 @@ function toolPayload(response) {
   return JSON.parse(response.result.content[0].text);
 }
 
+function failedToolPayload(response) {
+  assert.deepEqual(Object.keys(response.result).sort(), ['content', 'isError']);
+  assert.equal(response.result.isError, true);
+  assert.equal(response.result.content.length, 1);
+  assert.equal(response.result.content[0].type, 'text');
+  return JSON.parse(response.result.content[0].text);
+}
+
 test('stdio does not lose initialize received while event stream starts', async () => {
   const gateway = fakeGateway();
   const input = new PassThrough();
@@ -104,6 +112,23 @@ test('stdio runner starts and stops daemon event stream with its lifecycle', asy
   output.resume();
   await runStdio(gateway, Readable.from([]), output);
   assert.deepEqual(lifecycle, ['start', 'stop']);
+});
+
+test('stdio treats an output EPIPE as a closed client without crashing', async () => {
+  const output = new Writable({
+    write(_chunk, _encoding, _callback) {
+      queueMicrotask(() => {
+        const problem = Object.assign(new Error('client closed'), { code: 'EPIPE' });
+        this.emit('error', problem);
+      });
+    },
+  });
+  const input = Readable.from([
+    `${JSON.stringify({ jsonrpc: '2.0', id: 92, method: 'initialize', params: {} })}\n`,
+  ]);
+
+  await runStdio(fakeGateway(), input, output);
+  assert.equal(output.listenerCount('error'), 0);
 });
 
 test('initialize negotiates MCP protocolVersion 2024-11-05', async () => {
@@ -197,6 +222,50 @@ test('dial fails closed before touching the phone when its opening is not ready'
     'prewarmSpeech',
     { text: approvedDial().openingText },
   ]]);
+});
+
+test('gateway failures return a bounded MCP tool error without leaking exception details', async () => {
+  const gateway = fakeGateway();
+  gateway.dial = async () => {
+    throw Object.assign(new Error('token=private-value at /etc/agentcall/gateway.env'), {
+      code: 'GATEWAY_OPERATION_FAILED',
+    });
+  };
+  const response = await new McpHandler(gateway).handle(call('dial', approvedDial()));
+  assert.deepEqual(failedToolPayload(response), {
+    accepted: false,
+    reason: 'gateway request failed',
+  });
+  assert.doesNotMatch(JSON.stringify(response), /private-value|\/etc\/agentcall|token=/i);
+});
+
+test('gateway transport failures are classified into actionable MCP tool errors', async () => {
+  const cases = [
+    [Object.assign(new Error('connect ENOENT /run/private.sock'), { code: 'ENOENT' }), 'gateway unavailable'],
+    [new Error('RPC call timed out'), 'gateway timed out'],
+    [Object.assign(new Error('RPC call aborted'), { code: 'ABORT_ERR' }), 'operation aborted'],
+    [Object.assign(new Error('invalid RPC response'), { code: 'INVALID_RPC_RESPONSE' }), 'invalid gateway response'],
+  ];
+  for (const [problem, reason] of cases) {
+    const gateway = fakeGateway();
+    gateway.status = async () => { throw problem; };
+    assert.deepEqual(
+      failedToolPayload(await new McpHandler(gateway).handle(call('status', {}))),
+      { accepted: false, reason },
+    );
+  }
+});
+
+test('malformed successful gateway data fails closed as an MCP tool error', async () => {
+  const gateway = fakeGateway();
+  gateway.answer = async () => 'not a receipt';
+  assert.deepEqual(
+    failedToolPayload(await new McpHandler(gateway).handle(call('answer', {
+      callId: 'call-1',
+      idempotencyKey: 'malformed-receipt',
+    }))),
+    { accepted: false, reason: 'invalid gateway response' },
+  );
 });
 
 test('dial automatically plays its prepared opening once when outgoing media becomes active', async () => {

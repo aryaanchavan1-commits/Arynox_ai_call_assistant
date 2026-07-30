@@ -6,6 +6,7 @@ const MAX_LINE_BYTES = 64 * 1024;
 const MAX_EVENT_DEPTH = 8;
 const MAX_RPC_TIMEOUT_MS = 120_000;
 const SPEECH_RPC_TIMEOUT_MS = 60_000;
+const RPC_ERROR_CODE_RE = /^[A-Z][A-Z0-9_]{2,63}$/;
 const CALL_ID_RE = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 const RECORDING_ARTIFACTS = new Set(['remote.wav', 'agent.wav', 'conversation.wav', 'conversation.mkv']);
 const PROVIDER_MODELS = Object.freeze({
@@ -194,6 +195,64 @@ function safeWrite(socket, value) {
   }
 }
 
+const SAFE_RPC_ERRORS = Object.freeze({
+  'method not allowed': Object.freeze({ code: 'METHOD_NOT_ALLOWED', message: 'method not allowed' }),
+  'invalid request': Object.freeze({ code: 'INVALID_REQUEST', message: 'invalid request' }),
+  'request too large': Object.freeze({ code: 'REQUEST_TOO_LARGE', message: 'request too large' }),
+  'arguments not allowed': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'arguments not allowed' }),
+  'invalid request id': Object.freeze({ code: 'INVALID_REQUEST', message: 'invalid request' }),
+  'audio frame is invalid': Object.freeze({ code: 'INVALID_AUDIO_FRAME', message: 'audio frame is invalid' }),
+  'recording limit is invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'recording limit is invalid' }),
+  'contact limit is invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'contact limit is invalid' }),
+  'call-log limit is invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'call-log limit is invalid' }),
+  'recorded dial consent is invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'recorded dial consent is invalid' }),
+  'recording artifact arguments are invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'recording artifact arguments are invalid' }),
+  'recording sync arguments are invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'recording sync arguments are invalid' }),
+  'recording deletion arguments are invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'recording deletion arguments are invalid' }),
+  'provider kind is invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'provider kind is invalid' }),
+  'speech prewarm text is invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'speech prewarm text is invalid' }),
+  'speech interruption mode is invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'speech interruption mode is invalid' }),
+  'provider catalog arguments are invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'provider catalog arguments are invalid' }),
+  'device evidence arguments are invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'device evidence arguments are invalid' }),
+  'provider configuration arguments are invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'provider configuration arguments are invalid' }),
+  'agent answering configuration arguments are invalid': Object.freeze({ code: 'INVALID_ARGUMENTS', message: 'agent answering configuration arguments are invalid' }),
+});
+
+function safeRpcError(problem) {
+  const message = String(problem?.message ?? '').toLowerCase();
+  return SAFE_RPC_ERRORS[message]
+    ?? Object.freeze({ code: 'GATEWAY_OPERATION_FAILED', message: 'gateway operation failed' });
+}
+
+function parseRpcError(value) {
+  if (typeof value === 'string') {
+    return safeRpcError({ message: value });
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)
+      || Object.keys(value).length !== 2
+      || !Object.hasOwn(value, 'code') || !Object.hasOwn(value, 'message')
+      || !RPC_ERROR_CODE_RE.test(value.code ?? '')
+      || typeof value.message !== 'string' || value.message.length < 1 || value.message.length > 160) {
+    return { code: 'INVALID_RPC_RESPONSE', message: 'invalid RPC response' };
+  }
+  const known = Object.values(SAFE_RPC_ERRORS).find(
+    ({ code, message }) => code === value.code && message === value.message,
+  );
+  if (known) return known;
+  if (value.code === 'GATEWAY_OPERATION_FAILED' && value.message === 'gateway operation failed') {
+    return value;
+  }
+  return { code: 'GATEWAY_OPERATION_FAILED', message: 'gateway operation failed' };
+}
+
+export class GatewayRpcError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = 'GatewayRpcError';
+    this.code = code;
+  }
+}
+
 export class GatewayRpcServer {
   constructor(gateway, { socketPath, platform = process.platform }) {
     if (!socketPath) throw new Error('socketPath is required');
@@ -266,6 +325,7 @@ export class GatewayRpcServer {
             continue;
           }
           if (!request || !validRpcId(request.id)) throw new Error('invalid request id');
+          if (!exactKeys(request, ['id', 'method', 'args'])) throw new Error('invalid request');
           if (request.method === 'events' && exactKeys(request.args, [])) {
             this.eventSockets.add(socket);
             if (!safeWrite(socket, { id: request.id, result: { subscribed: true } })) return;
@@ -282,9 +342,10 @@ export class GatewayRpcServer {
           const result = await this.gateway[request.method](request.args);
           if (!safeWrite(socket, { id: request.id, result })) return;
         } catch (error) {
+          const publicError = safeRpcError(error);
           if (!safeWrite(socket, {
             id: validRpcId(request?.id) ? request.id : null,
-            error: String(error?.message || 'RPC failed').slice(0, 160),
+            error: publicError,
           })) return;
         }
       }
@@ -404,7 +465,11 @@ export class GatewayRpcClient extends EventEmitter {
             const message = JSON.parse(line);
             if (!acknowledged) {
               if (message.id !== id) throw new Error('RPC response id mismatch');
-              if (message.result?.subscribed !== true) throw new Error('event subscription refused');
+              if (!exactKeys(message, ['id', 'result'])
+                  || !exactKeys(message.result, ['subscribed'])
+                  || message.result.subscribed !== true) {
+                throw new Error('event subscription refused');
+              }
               acknowledged = true;
               settled = true;
               cleanupHandshake();
@@ -413,8 +478,11 @@ export class GatewayRpcClient extends EventEmitter {
                 if (this.eventSocket === socket) this.eventSocket = null;
               });
               resolve();
-            } else if (message.event && typeof message.event === 'object') {
+            } else if (exactKeys(message, ['event'])
+                && message.event && typeof message.event === 'object' && !Array.isArray(message.event)) {
               this.emit('event', message.event);
+            } else {
+              throw new Error('invalid event frame');
             }
           } catch (problem) {
             if (!acknowledged) fail(problem);
@@ -480,7 +548,16 @@ export class GatewayRpcClient extends EventEmitter {
         try {
           const response = JSON.parse(pending.slice(0, newline));
           if (!response || response.id !== id) throw new Error('RPC response id mismatch');
-          if (response.error) finish(new Error(String(response.error).slice(0, 160)));
+          const hasResult = Object.hasOwn(response, 'result');
+          const hasError = Object.hasOwn(response, 'error');
+          if (typeof response !== 'object' || Array.isArray(response)
+              || Object.keys(response).length !== 2 || hasResult === hasError) {
+            throw new Error('invalid RPC response');
+          }
+          if (hasError) {
+            const problem = parseRpcError(response.error);
+            finish(new GatewayRpcError(problem.code, problem.message));
+          }
           else finish(null, response.result);
         } catch (problem) {
           finish(problem?.message === 'RPC response id mismatch'

@@ -188,7 +188,7 @@ export class LocalControlPlane extends EventEmitter {
 
   #live(method, args) {
     if (this.delegate) return this.delegate[method](args);
-    return Promise.resolve({ accepted: false, reason: 'phone_not_connected' });
+    return Promise.resolve({ accepted: false, reason: 'phone disconnected' });
   }
 
   dial(args) { return this.#live('dial', args); }
