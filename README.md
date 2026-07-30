@@ -2,7 +2,7 @@
   <img src="docs/assets/agentcall-icon.png" width="128" alt="AgentCall application icon">
   <h1>AgentCall</h1>
   <p><strong>Private, USB-only cellular calling for local AI agents.</strong></p>
-  <p>Turn a rooted Android phone into a secure voice endpoint for Hermes, OpenClaw, and human desktop operators.</p>
+  <p>Turn a rooted Android phone into a secure voice endpoint for Hermes, OpenClaw, and Human Desktop Operators.</p>
 
   <p>
     <a href="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml"><img src="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml/badge.svg?branch=main" alt="Verify status"></a>
