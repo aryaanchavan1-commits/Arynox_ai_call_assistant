@@ -2,7 +2,7 @@
 
 `build-artifacts.sh` accepts one already-built APK and produces the standalone APK plus a matched Magisk ZIP. It parses the APK with Android `aapt` and refuses a package or version mismatch before copying any release artifact.
 
-For the current release candidate, the only accepted identity is `com.callagent.gateway` version `1.0.0` (`332`). The debug APK and its matched module are `QUALIFICATION_ONLY_DEBUG_SIGNED`, `Publishable: NO`; they must not be described or uploaded as production-signed artifacts.
+For the current release candidate, the only accepted identity is `com.callagent.gateway` version `1.0.1` (`333`). The debug APK and its matched module are `QUALIFICATION_ONLY_DEBUG_SIGNED`, `Publishable: NO`; they must not be described or uploaded as production-signed artifacts.
 
 The generated `ARTIFACT-STATUS.txt` records parsed identity, standalone and embedded APK hashes, and byte-equality status. `ANDROID-ROLLBACK-MANIFEST.txt` records the fail-closed downgrade policy and the operator-supplied facts required before rollback. `SHA256SUMS` covers the two installable artifacts.
 

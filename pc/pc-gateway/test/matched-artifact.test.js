@@ -24,9 +24,9 @@ test('Node and package inputs consume exact canonical device-neutral manifest by
     });
     assert.equal(loaded.manifest.schemaVersion, 1);
     assert.equal(loaded.manifest.bootstrapProtocolVersion, 1);
-    assert.equal(loaded.manifest.desktopPackageVersion, '1.0.0');
+    assert.equal(loaded.manifest.desktopPackageVersion, '1.0.1');
     assert.equal(loaded.manifest.androidPackageName, 'com.callagent.gateway');
-    assert.equal(loaded.manifest.androidVersionCode, 332);
+    assert.equal(loaded.manifest.androidVersionCode, 333);
     assert.equal(loaded.manifest.androidSigningCertificateSha256.length, 64);
     assert.equal(loaded.digest.length, 32);
   } finally {
@@ -75,8 +75,8 @@ test('manifest parser rejects unknown duplicate missing private and self-digest 
   assert.throws(() => parseMatchedArtifactManifest(Buffer.concat([canonical, Buffer.from('unknown=value\n')])));
   assert.throws(() => parseMatchedArtifactManifest(Buffer.concat([canonical, Buffer.from('schemaVersion=1\n')])));
   assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('schemaVersion=1\n', ''))));
-  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('androidVersionCode=332', 'androidVersionCode=0332'))));
-  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('androidVersionCode=332', 'androidVersionCode=999999999999999999999999'))));
-  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('desktopPackageVersion=1.0.0', 'desktopPackageVersion=01.0.0'))));
+  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('androidVersionCode=333', 'androidVersionCode=0333'))));
+  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('androidVersionCode=333', 'androidVersionCode=999999999999999999999999'))));
+  assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace('desktopPackageVersion=1.0.1', 'desktopPackageVersion=01.0.1'))));
   assert.throws(() => parseMatchedArtifactManifest(Buffer.from(text.replace(/androidSigningCertificateSha256=[0-9a-f]{64}/, `androidSigningCertificateSha256=${'0'.repeat(64)}`))));
 });

@@ -1253,7 +1253,7 @@ export class McpHandler {
       return reply({ jsonrpc: '2.0', id, result: {
         protocolVersion: PROTOCOL_VERSION,
         capabilities: { tools: {}, resources: { subscribe: true, listChanged: false } },
-        serverInfo: { name: 'agentcall-mcp', version: '1.0.0' },
+        serverInfo: { name: 'agentcall-mcp', version: '1.0.1' },
       } });
     }
     if (method === 'notifications/initialized') return undefined;

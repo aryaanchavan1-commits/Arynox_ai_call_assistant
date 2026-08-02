@@ -9,9 +9,9 @@ class InstalledArtifactIdentityVerifierTest {
     private val manifest = MatchedArtifactManifest(
         schemaVersion = 1,
         bootstrapProtocolVersion = 1,
-        desktopPackageVersion = "1.0.0",
+        desktopPackageVersion = "1.0.1",
         androidPackageName = "com.callagent.gateway",
-        androidVersionCode = 332,
+        androidVersionCode = 333,
         androidSigningCertificateSha256 = signer,
     )
     private val build = InstalledArtifactIdentityVerifier.BuildFacts(
@@ -23,7 +23,7 @@ class InstalledArtifactIdentityVerifierTest {
     )
     private val installed = InstalledArtifactIdentityVerifier.PackageFacts(
         packageName = "com.callagent.gateway",
-        versionCode = 332,
+        versionCode = 333,
         currentSignerSha256 = listOf(signer),
     )
     private val claim = ControllerBootstrapProtocolV2.Identity(

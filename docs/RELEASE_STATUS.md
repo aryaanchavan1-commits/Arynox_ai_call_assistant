@@ -1,13 +1,13 @@
 # AgentCall release status
 
-Updated: 2026-07-30
+Updated: 2026-08-02
 
 ## Classification
 
-**Hardware-qualified v1.0.0 release**
+**Hardware-qualified v1.0.1 release**
 
-- Desktop version: `1.0.0`
-- Android version: `1.0.0 (332)`
+- Desktop version: `1.0.1`
+- Android version: `1.0.1 (333)`
 - Reference phone: Xiaomi POCO M2 Pro (`gram`, Qualcomm `atoll`)
 - Reference Android: tested Android 15 / API 35 build, Magisk 30.7,
   SELinux Enforcing
@@ -24,7 +24,7 @@ app-store, Authenticode, or signed-repository artifacts.
 
 ### Automated
 
-- Gateway and MCP: 442 tests pass on Linux with 0 failures; 437 pass and 5
+- Gateway and MCP: 455 tests pass on Linux with 0 failures; 450 pass and 5
   platform-specific skips on Windows.
 - Desktop: 108 tests and syntax checks pass on Windows and Linux.
 - Android: unit tests, lint, manifest binding, and debug APK assembly are part

@@ -1035,7 +1035,7 @@ async function renderSettings() {
   const storage = setupCard('Recordings & privacy', 'Finalized recordings are managed by the gateway service. Speech credentials remain write-only and are never rendered here.');
   addStatusRow(storage, 'Recording catalog', 'Local');
   addStatusRow(storage, 'Credential display', 'Never');
-  addStatusRow(storage, 'Release', '1.0.0');
+  addStatusRow(storage, 'Release', '1.0.1');
   const project = setupCard(
     'AgentCall on GitHub',
     'Read the setup guide, download releases, report issues, and contribute to the project.',

@@ -566,7 +566,7 @@ test('gatewayd derives zero-touch artifact identity from the packaged canonical 
       assert.equal(path, '/usr/share/agentcall/protocol/matched-artifact.properties');
       return {
         manifest: {
-          schemaVersion: 1, bootstrapProtocolVersion: 2, desktopPackageVersion: '1.0.0',
+          schemaVersion: 1, bootstrapProtocolVersion: 2, desktopPackageVersion: '1.0.1',
           androidPackageName: 'com.callagent.gateway', androidVersionCode: 330,
           androidSigningCertificateSha256: 'a'.repeat(64),
         },

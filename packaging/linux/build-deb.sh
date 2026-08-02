@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-version=1.0.0
+version=1.0.1
 arch=all
 gateway_source=
 output=

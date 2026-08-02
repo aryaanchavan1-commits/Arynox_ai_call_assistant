@@ -16,7 +16,7 @@ export function parseMatchedArtifactManifest(bytes) {
     return value;
   });
   if (values[0] !== '1' || values[1] !== '1' || !/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(values[2]) || !/^[1-9]\d*$/.test(values[4]) || !/^[0-9a-f]{64}$/.test(values[5]) || /^0{64}$/.test(values[5])) throw new Error('matched artifact manifest value is invalid');
-  if (values[2] !== '1.0.0' || values[3] !== 'com.callagent.gateway' || values[4] !== '332') throw new Error('matched artifact release identity is unsupported');
+  if (values[2] !== '1.0.1' || values[3] !== 'com.callagent.gateway' || values[4] !== '333') throw new Error('matched artifact release identity is unsupported');
   const versionCode = Number(values[4]);
   if (!Number.isSafeInteger(versionCode) || versionCode <= 0) throw new Error('matched artifact version is invalid');
   return { schemaVersion: 1, bootstrapProtocolVersion: 1, desktopPackageVersion: values[2], androidPackageName: values[3], androidVersionCode: versionCode, androidSigningCertificateSha256: values[5] };

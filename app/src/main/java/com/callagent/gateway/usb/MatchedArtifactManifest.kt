@@ -26,7 +26,7 @@ data class MatchedArtifactManifest(
             }
             require(values[0] == "1" && values[1] == "1") { "manifest schema is unsupported" }
             require(Regex("(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)").matches(values[2])) { "desktop package version is invalid" }
-            require(values[2] == "1.0.0" && values[3] == "com.callagent.gateway" && values[4] == "332") { "manifest release identity is unsupported" }
+            require(values[2] == "1.0.1" && values[3] == "com.callagent.gateway" && values[4] == "333") { "manifest release identity is unsupported" }
             require(hex.matches(values[5]) && values[5].any { it != '0' }) { "signer digest is invalid" }
             val versionCode = values[4].toLongOrNull()
             require(versionCode != null && versionCode > 0) { "Android version is invalid" }

@@ -60,9 +60,9 @@ class DesktopIdentityTest(unittest.TestCase):
     def test_desktop_version_is_derived_from_named_desktop_package(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "package.json"
-            path.write_text('{"name":"agentcall-desktop","version":"1.0.0"}')
-            self.assertEqual("1.0.0", desktop_package_version(path))
-            path.write_text('{"name":"other-desktop","version":"1.0.0"}')
+            path.write_text('{"name":"agentcall-desktop","version":"1.0.1"}')
+            self.assertEqual("1.0.1", desktop_package_version(path))
+            path.write_text('{"name":"other-desktop","version":"1.0.1"}')
             with self.assertRaises(ManifestBuildError):
                 desktop_package_version(path)
 

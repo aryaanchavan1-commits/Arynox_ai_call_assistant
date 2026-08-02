@@ -6,7 +6,7 @@
 
   <p>
     <a href="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml"><img src="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml/badge.svg?branch=main" alt="Verify status"></a>
-    <a href="https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/AgentCall-v1.0.0-00A896.svg" alt="AgentCall v1.0.0"></a>
+    <a href="https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.1"><img src="https://img.shields.io/badge/AgentCall-v1.0.1-00A896.svg" alt="AgentCall v1.0.1"></a>
     <a href="docs/RELEASE_STATUS.md"><img src="https://img.shields.io/badge/Hardware-qualified-00A896.svg" alt="Hardware-qualified"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/AGPL-3.0-2563EB.svg" alt="AGPL 3.0"></a>
   </p>
@@ -21,7 +21,7 @@
 </div>
 
 > [!IMPORTANT]
-> AgentCall v1.0.0 is the **first hardware-qualified release** for the
+> AgentCall v1.0.1 is the current **hardware-qualified patch release** for the
 > Xiaomi POCO M2 Pro reference setup. The Android APK and matched Magisk
 > module use the protected AgentCall production signing identity. The Windows
 > installer is not Authenticode signed, and the Debian package is not
@@ -176,28 +176,29 @@ lossless PNG from the [`screenshots/`](screenshots/README.md) directory.
 ## Release downloads
 
 Download the current files from
-[AgentCall v1.0.0](https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.0).
+[AgentCall v1.0.1](https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.1).
 
 | Asset | Use |
 |---|---|
-| `agentcall-desktop-1.0.0-x64-setup.exe` | Windows 10/11 x86-64 desktop, managed gateway, ADB, and FFmpeg |
-| `agentcall-desktop-1.0.0-amd64.deb` | Debian/Ubuntu x86-64 desktop, gateway service, MCP launcher, and recovery tools |
-| `AgentCall-privileged-1.0.0-332-magisk.zip` | Qualified rooted-phone path; includes the matched APK and protected permissions |
-| `AgentCall-1.0.0-332.apk` | Ordinary Android UI/development installation without protected telephony audio |
-| `SHA256SUMS` | SHA-256 checksums for release files |
-| `ARTIFACT-STATUS.txt` | Android qualification and signing classification |
-| `ANDROID-ROLLBACK-MANIFEST.txt` | Android rollback evidence |
+| `agentcall-desktop-1.0.1-x64-setup.exe` | Windows 10/11 x86-64 desktop, managed gateway, ADB, and FFmpeg |
+| `agentcall-desktop-1.0.1-amd64.deb` | Debian/Ubuntu x86-64 desktop, gateway service, MCP launcher, and recovery tools |
+| `AgentCall-privileged-1.0.1-333-magisk.zip` | Qualified rooted-phone path; includes the matched APK and protected permissions |
+| `AgentCall-1.0.1-333.apk` | Ordinary Android UI/development installation without protected telephony audio |
+
+SHA-256 checksums are published in the GitHub release notes.
 
 On Linux, verify the files you downloaded:
 
 ```bash
-sha256sum --ignore-missing -c SHA256SUMS
+sha256sum agentcall-desktop-1.0.1-amd64.deb \
+  AgentCall-1.0.1-333.apk \
+  AgentCall-privileged-1.0.1-333-magisk.zip
 ```
 
-On Windows, compare each result with its line in `SHA256SUMS`:
+On Windows, compare the result with the matching checksum in the release notes:
 
 ```powershell
-Get-FileHash -Algorithm SHA256 .\agentcall-desktop-1.0.0-x64-setup.exe
+Get-FileHash -Algorithm SHA256 .\agentcall-desktop-1.0.1-x64-setup.exe
 ```
 
 ## Installation
@@ -215,7 +216,7 @@ Choose exactly one Android installation method.
 
 #### Qualified Magisk module
 
-1. Copy `AgentCall-privileged-1.0.0-332-magisk.zip` to the phone.
+1. Copy `AgentCall-privileged-1.0.1-333-magisk.zip` to the phone.
 2. Review and install it from Magisk.
 3. Require a successful installer result and reboot.
 4. Open AgentCall and select it as the default Phone application.
@@ -226,7 +227,7 @@ Choose exactly one Android installation method.
 Use the APK for UI or development validation without protected telephony audio:
 
 ```bash
-adb install AgentCall-1.0.0-332.apk
+adb install AgentCall-1.0.1-333.apk
 ```
 
 Verify the installed state:
@@ -237,14 +238,14 @@ adb shell dumpsys package com.callagent.gateway
 adb shell cmd role get-role-holders android.app.role.DIALER
 ```
 
-The expected package is `com.callagent.gateway`, version `1.0.0 (332)`, and
+The expected package is `com.callagent.gateway`, version `1.0.1 (333)`, and
 the dialer role must name AgentCall.
 
 ### 2. Install AgentCall Desktop
 
 #### Windows
 
-1. Run `agentcall-desktop-1.0.0-x64-setup.exe`.
+1. Run `agentcall-desktop-1.0.1-x64-setup.exe`.
 2. Choose the installation directory and finish setup.
 3. Open **AgentCall Desktop** from Start or its desktop shortcut.
 
@@ -255,7 +256,7 @@ user's application-data directory.
 #### Debian or Ubuntu
 
 ```bash
-sudo apt install ./agentcall-desktop-1.0.0-amd64.deb
+sudo apt install ./agentcall-desktop-1.0.1-amd64.deb
 sudo apt install adb ffmpeg python3
 ```
 
@@ -426,8 +427,8 @@ Build qualification artifacts:
 packaging/android/build-artifacts.sh \
   --apk app/build/outputs/apk/debug/app-debug.apk \
   --output release/android \
-  --version-name 1.0.0 \
-  --version-code 332
+  --version-name 1.0.1 \
+  --version-code 333
 
 packaging/linux/build-unified-desktop-deb.sh \
   --output "$PWD/release/desktop"

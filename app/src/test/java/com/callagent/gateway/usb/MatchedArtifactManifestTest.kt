@@ -19,9 +19,9 @@ class MatchedArtifactManifestTest {
         val manifest = MatchedArtifactManifest.parse(canonical)
         assertEquals(1, manifest.schemaVersion)
         assertEquals(1, manifest.bootstrapProtocolVersion)
-        assertEquals("1.0.0", manifest.desktopPackageVersion)
+        assertEquals("1.0.1", manifest.desktopPackageVersion)
         assertEquals("com.callagent.gateway", manifest.androidPackageName)
-        assertEquals(332L, manifest.androidVersionCode)
+        assertEquals(333L, manifest.androidVersionCode)
         assertEquals(32, manifest.androidSigningCertificateSha256.size)
         assertEquals(32, MatchedArtifactManifest.sha256(canonical).size)
     }
@@ -39,9 +39,9 @@ class MatchedArtifactManifestTest {
             canonical + "unknown=value\n".toByteArray(),
             canonical + "schemaVersion=1\n".toByteArray(),
             canonical.toString(Charsets.US_ASCII).replace("schemaVersion=1\n", "").toByteArray(),
-            canonical.toString(Charsets.US_ASCII).replace("androidVersionCode=332", "androidVersionCode=0332").toByteArray(),
-            canonical.toString(Charsets.US_ASCII).replace("androidVersionCode=332", "androidVersionCode=999999999999999999999999").toByteArray(),
-            canonical.toString(Charsets.US_ASCII).replace("desktopPackageVersion=1.0.0", "desktopPackageVersion=01.0.0").toByteArray(),
+            canonical.toString(Charsets.US_ASCII).replace("androidVersionCode=333", "androidVersionCode=0333").toByteArray(),
+            canonical.toString(Charsets.US_ASCII).replace("androidVersionCode=333", "androidVersionCode=999999999999999999999999").toByteArray(),
+            canonical.toString(Charsets.US_ASCII).replace("desktopPackageVersion=1.0.1", "desktopPackageVersion=01.0.1").toByteArray(),
             canonical.toString(Charsets.US_ASCII).replace(Regex("androidSigningCertificateSha256=[0-9a-f]{64}"), "androidSigningCertificateSha256=${"0".repeat(64)}").toByteArray(),
         ).forEach { bytes ->
             assertTrue(runCatching { MatchedArtifactManifest.parse(bytes) }.isFailure)

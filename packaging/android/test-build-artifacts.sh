@@ -9,7 +9,7 @@ printf 'fixture-apk' > "$fixture"
 mkdir -p "$tmp/bin"
 cat > "$tmp/bin/aapt" <<'EOF'
 #!/bin/sh
-printf "package: name='com.callagent.gateway' versionCode='332' versionName='1.0.0' platformBuildVersionName=''\n"
+printf "package: name='com.callagent.gateway' versionCode='333' versionName='1.0.1' platformBuildVersionName=''\n"
 EOF
 chmod 0755 "$tmp/bin/aapt"
 
@@ -26,11 +26,11 @@ grep -F 'APK version mismatch' "$tmp/version-mismatch.err" >/dev/null
 PATH="$tmp/bin:$PATH" "$root/packaging/android/build-artifacts.sh" \
   --apk "$fixture" \
   --output "$tmp/out" \
-  --version-name 1.0.0 \
-  --version-code 332
+  --version-name 1.0.1 \
+  --version-code 333
 
-apk="$tmp/out/AgentCall-1.0.0-332.apk"
-module="$tmp/out/AgentCall-privileged-1.0.0-332-magisk.zip"
+apk="$tmp/out/AgentCall-1.0.1-333.apk"
+module="$tmp/out/AgentCall-privileged-1.0.1-333-magisk.zip"
 test -f "$apk"
 test -f "$module"
 cmp -s "$fixture" "$apk"
@@ -38,8 +38,8 @@ unzip -t "$module" >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'id=agentcall-privileged' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'name=AgentCall Privileged Telephony Bridge' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'author=sidinsearch' >/dev/null
-unzip -p "$module" module.prop | grep -Fx 'version=1.0.0' >/dev/null
-unzip -p "$module" module.prop | grep -Fx 'versionCode=332' >/dev/null
+unzip -p "$module" module.prop | grep -Fx 'version=1.0.1' >/dev/null
+unzip -p "$module" module.prop | grep -Fx 'versionCode=333' >/dev/null
 unzip -p "$module" META-INF/com/google/android/update-binary > "$tmp/update-binary"
 grep -F 'install_module || exit $?' "$tmp/update-binary" >/dev/null
 if grep -Fx 'exit 0' "$tmp/update-binary" >/dev/null; then
@@ -59,7 +59,7 @@ if grep -Eq '^[[:space:]]*set[[:space:]]+-' "$tmp/customize.sh"; then
 fi
 mkdir -p "$tmp/module-root/system/priv-app/agentcall" "$tmp/modules/agentcall-privileged"
 unzip -p "$module" system/priv-app/agentcall/agentcall.apk > "$tmp/module-root/system/priv-app/agentcall/agentcall.apk"
-printf 'versionCode=333\n' > "$tmp/modules/agentcall-privileged/module.prop"
+printf 'versionCode=334\n' > "$tmp/modules/agentcall-privileged/module.prop"
 if MODPATH="$tmp/module-root" NVBASE="$tmp" sh -c '
   ui_print() { :; }
   abort() { printf "%s\n" "$1" >&2; exit 1; }
@@ -68,7 +68,7 @@ if MODPATH="$tmp/module-root" NVBASE="$tmp" sh -c '
   echo 'customize.sh accepted an in-place module downgrade' >&2
   exit 1
 fi
-grep -F 'Refusing in-place downgrade from versionCode 333 to 332' "$tmp/downgrade.err" >/dev/null
+grep -F 'Refusing in-place downgrade from versionCode 334 to 333' "$tmp/downgrade.err" >/dev/null
 unzip -p "$module" system/priv-app/agentcall/agentcall.apk > "$tmp/module.apk"
 cmp -s "$fixture" "$tmp/module.apk"
 unzip -p "$module" service.sh > "$tmp/service.sh"
@@ -78,7 +78,7 @@ if grep -E 'pm uninstall-system-updates|pm uninstall --user 0 "\$PKG"|install-ex
   echo 'service.sh must preserve the installed app, its data, and its dialer role during upgrades' >&2
   exit 1
 fi
-grep -F "EXPECTED_CODE='332'" "$tmp/service.sh" >/dev/null
+grep -F "EXPECTED_CODE='333'" "$tmp/service.sh" >/dev/null
 grep -F "EXPECTED_HASH='$(sha256sum "$apk" | cut -d' ' -f1)'" "$tmp/service.sh" >/dev/null
 grep -F 'android.permission.READ_CONTACTS' "$tmp/service.sh" >/dev/null
 grep -F 'android.permission.READ_CALL_LOG' "$tmp/service.sh" >/dev/null
@@ -114,13 +114,13 @@ fi
 grep -F 'QUALIFICATION_ONLY_DEBUG_SIGNED' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F 'Publishable: NO' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F 'Parsed APK package: com.callagent.gateway' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
-grep -F 'Parsed APK version: 1.0.0 (332)' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
+grep -F 'Parsed APK version: 1.0.1 (333)' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F "Standalone APK SHA-256: $(sha256sum "$apk" | cut -d' ' -f1)" "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 grep -F 'Standalone/embedded APK byte equality: VERIFIED' "$tmp/out/ARTIFACT-STATUS.txt" >/dev/null
 
 test -f "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt"
 grep -F 'Current package: com.callagent.gateway' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
-grep -F 'Current version: 1.0.0 (332)' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
+grep -F 'Current version: 1.0.1 (333)' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
 grep -F 'Downgrade policy: REFUSE_IN_PLACE_DOWNGRADE' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
 grep -F 'Rollback requires: remove module, reboot, verify package absence, then install a separately verified prior matched artifact' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
 grep -F 'Device rollback qualification: NOT_RUN_APPROVAL_REQUIRED' "$tmp/out/ANDROID-ROLLBACK-MANIFEST.txt" >/dev/null
@@ -128,11 +128,11 @@ grep -F 'Device rollback qualification: NOT_RUN_APPROVAL_REQUIRED' "$tmp/out/AND
 PATH="$tmp/bin:$PATH" "$root/packaging/android/build-artifacts.sh" \
   --apk "$fixture" \
   --output "$tmp/out-second" \
-  --version-name 1.0.0 \
-  --version-code 332 >/dev/null
+  --version-name 1.0.1 \
+  --version-code 333 >/dev/null
 for artifact in \
-  AgentCall-1.0.0-332.apk \
-  AgentCall-privileged-1.0.0-332-magisk.zip \
+  AgentCall-1.0.1-333.apk \
+  AgentCall-privileged-1.0.1-333-magisk.zip \
   ARTIFACT-STATUS.txt \
   ANDROID-ROLLBACK-MANIFEST.txt \
   SHA256SUMS; do

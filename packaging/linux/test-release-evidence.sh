@@ -45,12 +45,12 @@ fi
 grep -Eq '^LINTIAN=(PASS|NOT_RUN:not-installed)$' "$status"
 grep -Eq '^VULNERABILITY_SCAN=(PASS|NOT_RUN:not-installed)$' "$status"
 
-deb="$tmp/out/agentcall-gatewayd_1.0.0_all.deb"
+deb="$tmp/out/agentcall-gatewayd_1.0.1_all.deb"
 test -f "$deb"
 test -f "$deb.sha256"
-test -f "$tmp/out/agentcall-gatewayd_1.0.0.cdx.json"
-python3 -m json.tool "$tmp/out/agentcall-gatewayd_1.0.0.cdx.json" >/dev/null
-python3 - "$tmp/out/agentcall-gatewayd_1.0.0.cdx.json" <<'PY'
+test -f "$tmp/out/agentcall-gatewayd_1.0.1.cdx.json"
+python3 -m json.tool "$tmp/out/agentcall-gatewayd_1.0.1.cdx.json" >/dev/null
+python3 - "$tmp/out/agentcall-gatewayd_1.0.1.cdx.json" <<'PY'
 import json, sys
 bom = json.load(open(sys.argv[1], encoding='utf-8'))
 assert bom['metadata']['component']['licenses'] == [{'license': {'id': 'AGPL-3.0-only'}}]

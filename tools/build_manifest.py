@@ -225,7 +225,7 @@ def desktop_package_version(path=DESKTOP_PACKAGE_JSON):
         package = json.loads(descriptor_bound_read(path, 1024 * 1024).decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError) as error:
         raise ManifestBuildError("desktop package metadata rejected") from error
-    if package.get("name") != "agentcall-desktop" or package.get("version") != "1.0.0":
+    if package.get("name") != "agentcall-desktop" or package.get("version") != "1.0.1":
         raise ManifestBuildError("desktop package identity mismatch")
     return package["version"]
 
@@ -324,13 +324,13 @@ def verify_final_embedded_manifest(apk, expected):
             raise ManifestBuildError("final embedded manifest rejected") from error
 
 
-def canonical_manifest(digest, desktop_version="1.0.0"):
+def canonical_manifest(digest, desktop_version="1.0.1"):
     if len(digest) != 32 or not any(digest):
         raise ManifestBuildError("invalid signer digest")
-    if desktop_version != "1.0.0":
+    if desktop_version != "1.0.1":
         raise ManifestBuildError("desktop package identity mismatch")
     return (f"schemaVersion=1\nbootstrapProtocolVersion=1\ndesktopPackageVersion={desktop_version}\n"
-            "androidPackageName=com.callagent.gateway\nandroidVersionCode=332\n"
+            "androidPackageName=com.callagent.gateway\nandroidVersionCode=333\n"
             f"androidSigningCertificateSha256={digest.hex()}\n").encode("ascii")
 
 def atomic_write(path, data):
