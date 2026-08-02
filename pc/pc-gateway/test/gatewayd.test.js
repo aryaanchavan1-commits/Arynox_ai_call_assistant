@@ -3,7 +3,12 @@ import { EventEmitter } from 'node:events';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
 
-import { classifyPhoneSetupFailure, LocalControlPlane, runGatewayd } from '../src/gatewayd.js';
+import {
+  classifyPhoneSetupFailure,
+  deviceEvidenceProvisioningArgs,
+  LocalControlPlane,
+  runGatewayd,
+} from '../src/gatewayd.js';
 
 const ENV = Object.freeze({
   AGENTCALL_DEVICE_SERIAL: 'exact-serial',
@@ -28,6 +33,40 @@ test('phone setup failures expose actionable bounded reason codes without raw AD
     classifyPhoneSetupFailure(new Error('identity mismatch: private fingerprint'), 'VERIFYING_DEVICE'),
     { stage: 'BLOCKED', reasonCode: 'unsupported_phone_build' },
   );
+});
+
+test('matched POCO identity produces bounded evidence provisioning arguments', () => {
+  const args = deviceEvidenceProvisioningArgs({
+    serial: 'c27d0cd8',
+    identity: {
+      product: 'lineage_miatoll',
+      device: 'gram',
+      model: 'POCO M2 Pro',
+      api: '35',
+      fingerprint: 'lineage/lineage_miatoll/gram:15/AP3A.240905.015.A2/build:userdebug/dev-keys',
+      vendorFingerprint: 'POCO/gram_in/gram:12/RKQ1.211019.001/V14.0.5.0.SJPINXM:user/release-keys',
+    },
+  }, new Date(2026, 7, 2, 12, 0, 0));
+
+  assert.equal(args.attestedOn, '2026-08-02');
+  assert.equal(args.observedSystemFingerprint.includes('lineage_miatoll'), true);
+  assert.equal(args.observedVendorFingerprint.startsWith('POCO/gram_in/gram:'), true);
+  assert.match(args.attestedSystemDescription, /POCO M2 Pro.*Android API 35/u);
+  assert.match(args.idempotencyKey, /^matched-device-evidence-[a-f0-9]{32}$/u);
+});
+
+test('unqualified or incomplete phone identities are never auto-provisioned', () => {
+  const complete = {
+    serial: 'c27d0cd8',
+    identity: {
+      product: 'lineage_miatoll', device: 'gram', model: 'POCO M2 Pro', api: '35',
+      fingerprint: 'system/fingerprint',
+      vendorFingerprint: 'POCO/gram_in/gram:12/RKQ1.211019.001/V14.0.5.0.SJPINXM:user/release-keys',
+    },
+  };
+  assert.equal(deviceEvidenceProvisioningArgs({ ...complete, identity: { ...complete.identity, device: 'other' } }), null);
+  assert.equal(deviceEvidenceProvisioningArgs({ ...complete, identity: { ...complete.identity, fingerprint: '' } }), null);
+  assert.equal(deviceEvidenceProvisioningArgs({ ...complete, identity: { ...complete.identity, vendorFingerprint: 'other' } }), null);
 });
 
 test('local control plane remains useful offline and denies every live phone action', async () => {
@@ -400,8 +439,9 @@ test('gatewayd production path pairs an absent credential before starting the au
     serial: 'exact-serial',
     identity: {
       product: 'lineage_miatoll', device: 'gram', api: '35',
+      model: 'POCO M2 Pro',
       fingerprint: 'POCO/lineage_miatoll/gram:15/AP3A/build:userdebug/dev-keys',
-      vendorFingerprint: 'POCO/lineage_miatoll/gram:15/AP3A/vendor:userdebug/dev-keys',
+      vendorFingerprint: 'POCO/gram_in/gram:12/RKQ1.211019.001/V14.0.5.0.SJPINXM:user/release-keys',
     },
   };
   const device = {
@@ -441,6 +481,13 @@ test('gatewayd production path pairs an absent credential before starting the au
   f.gateway.start = async (start) => {
     assert.deepEqual(start.existingForward, operationalForward);
     f.actions.push('gateway:start');
+  };
+  f.gateway.provisionDeviceEvidence = async (args) => {
+    assert.equal(args.observedSystemFingerprint, selected.identity.fingerprint);
+    assert.equal(args.observedVendorFingerprint, selected.identity.vendorFingerprint);
+    assert.match(args.idempotencyKey, /^matched-device-evidence-[a-f0-9]{32}$/u);
+    f.actions.push('device-evidence:provision');
+    return { accepted: true };
   };
 
   const starting = runGatewayd({
@@ -504,7 +551,7 @@ test('gatewayd production path pairs an absent credential before starting the au
     'redaction-salt:load', 'rpc:create-setup', 'rpc:start', 'credential:recover',
     'credential:load', 'adb:select-one', 'adb:verify-identity', 'adb:forward-bootstrap', 'bootstrap:transport',
     'bootstrap:pair', 'adb:forward-operational', 'g2:client', 'g2:authenticated',
-    'credential:load', 'gateway:create', 'gateway:start', 'adb:remove:54321',
+    'credential:load', 'gateway:create', 'gateway:start', 'device-evidence:provision', 'adb:remove:54321',
   ]);
   await runtime.stop();
 });

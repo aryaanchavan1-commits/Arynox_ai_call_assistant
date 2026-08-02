@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import { dirname, join, posix, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,6 +32,42 @@ const LOCAL_TOOLS = Object.freeze([
   'status', 'capabilities', 'wait_for_incoming_call', 'wait_for_turn',
   'dial', 'prepare_speech', 'answer', 'reject', 'hangup', 'send_dtmf', 'speak',
 ]);
+
+const APPROVED_GRAM_VENDOR_FINGERPRINT =
+  'POCO/gram_in/gram:12/RKQ1.211019.001/V14.0.5.0.SJPINXM:user/release-keys';
+
+function localIsoDate(now) {
+  const year = String(now.getFullYear()).padStart(4, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function deviceEvidenceProvisioningArgs(selected, now = new Date()) {
+  const identity = selected?.identity;
+  if (!identity || !(now instanceof Date) || !Number.isFinite(now.getTime())) return null;
+  const supported = identity.product === 'lineage_miatoll'
+    && identity.device === 'gram'
+    && identity.model === 'POCO M2 Pro'
+    && String(identity.api) === '35'
+    && typeof identity.fingerprint === 'string'
+    && identity.fingerprint.length > 0
+    && identity.fingerprint.length <= 1_024
+    && identity.vendorFingerprint === APPROVED_GRAM_VENDOR_FINGERPRINT;
+  if (!supported) return null;
+  const attestedOn = localIsoDate(now);
+  const digest = createHash('sha256')
+    .update(`${selected.serial}\0${identity.fingerprint}\0${identity.vendorFingerprint}\0${attestedOn}`)
+    .digest('hex')
+    .slice(0, 32);
+  return {
+    observedSystemFingerprint: identity.fingerprint,
+    observedVendorFingerprint: identity.vendorFingerprint,
+    attestedOn,
+    attestedSystemDescription: `${identity.model} ${identity.device}, Android API ${identity.api}, authenticated matched-device identity`,
+    idempotencyKey: `matched-device-evidence-${digest}`,
+  };
+}
 
 export class LocalControlPlane extends EventEmitter {
   constructor({
@@ -440,6 +476,13 @@ export async function runGatewayd({
               : {}),
           });
           await gateway.start({ ...config.start, ...(operationalForward ? { existingForward: operationalForward } : {}) });
+          const evidenceArgs = deviceEvidenceProvisioningArgs(selected);
+          if (evidenceArgs && typeof gateway.provisionDeviceEvidence === 'function') {
+            const evidence = await gateway.provisionDeviceEvidence(evidenceArgs);
+            if (evidence?.accepted !== true) {
+              throw new Error('matched device evidence provisioning failed');
+            }
+          }
           control.attach(gateway);
           control.setStage('AUTHENTICATED');
           device = gateway.device ?? device;
