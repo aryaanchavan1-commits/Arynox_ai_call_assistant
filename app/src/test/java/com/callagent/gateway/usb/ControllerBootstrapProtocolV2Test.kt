@@ -6,7 +6,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ControllerBootstrapProtocolV2Test {
-    private val identity = ControllerBootstrapProtocolV2.Identity("SYNTHETIC-ADB-0001", "synthetic_product", "synthetic_device", 35, "synthetic/system/device:15/AP3A/public:user/release-keys", "synthetic/vendor/device:15/AP3A/public:user/release-keys", "com.callagent.gateway", 333, ByteArray(32) { 0x55 }, ByteArray(32) { 0x66 }, 2, "1.0.1")
+    private val identity = ControllerBootstrapProtocolV2.Identity("SYNTHETIC-ADB-0001", "synthetic_product", "synthetic_device", 35, "synthetic/system/device:15/AP3A/public:user/release-keys", "synthetic/vendor/device:15/AP3A/public:user/release-keys", "com.callagent.gateway", 332, ByteArray(32) { 0x55 }, ByteArray(32) { 0x66 }, 2, "1.0.0")
     private val transcript = ControllerBootstrapProtocolV2.Transcript(ByteArray(32) { (it + 1).toByte() }, ByteArray(32) { (it + 33).toByte() }, ByteArray(32) { (it + 65).toByte() }, ByteArray(32) { (it + 97).toByte() }, identity)
 
     @Test fun `shared positive vector is exact and round trips`() {
