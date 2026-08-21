@@ -24,6 +24,7 @@
     "test": "node --test --test-reporter=spec test/*.test.js",
     "check": "node scripts/check.mjs test/*.test.js",
     "web": "node scripts/web-host.mjs",
+    "ai:call": "node scripts/ai-call.js",
     "qualify:live-conversation": "node scripts/live-conversation-qualification.js",
     "qualify:hermes-voice": "node scripts/hermes-voice-supervisor.js"
   },

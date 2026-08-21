@@ -32,6 +32,8 @@ set "AGENTCALL_RPC_SOCKET=\\.\pipe\agentcall-gatewayd-desktop"
 
 rem ---- optional: paste your Groq API key here, or save it in the app under Settings - Speech ----
 rem set "GROQ_API_KEY=REPLACE_WITH_YOUR_KEY"
+rem ---- optional: OpenCode Zen key (free models like big-pickle) for the AI conversation brain ----
+rem set "OPENCODE_API_KEY=REPLACE_WITH_YOUR_KEY"
 
 rem ---- mode selection ----
 rem   simulator = no phone needed (virtual phone, works immediately)

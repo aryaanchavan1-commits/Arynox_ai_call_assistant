@@ -308,7 +308,7 @@ Open **AgentCall Desktop → Speech**.
 |---|---|
 | Speech to text | Groq Whisper, OpenAI realtime transcription, ElevenLabs Scribe realtime |
 | Text to speech | Groq PlayAI / Orpheus, ElevenLabs streaming TTS, OpenAI TTS, local Supertonic |
-| AI conversation | Groq Llama chat models (llama-3.3-70b-versatile and more) |
+| AI conversation | Groq Llama chat models (llama-3.3-70b-versatile and more), OpenCode Zen free models (big-pickle and more) |
 
 Provider keys are write-only: the desktop renderer and MCP server cannot read
 them back. Changing the TTS provider, model, voice, or language invalidates the
@@ -336,6 +336,34 @@ conversation responder is available to agents as
 `GroqConversationResponder` (chat completions with bounded history, timeout,
 and abort handling) — see `pc/pc-gateway/src/groq-conversation-responder.js`.
 Never put your Groq key in Git, MCP config, screenshots, or command arguments.
+
+## OpenCode Zen free models (ArynoxTech)
+
+The conversation brain can also run on [OpenCode Zen](https://opencode.ai/docs/zen)
+with a single [OpenCode API key](https://opencode.ai/auth) — several models are
+free, so you can run AI calls at zero cost:
+
+| Function | OpenCode Zen model | Role |
+|---|---|---|
+| Conversation brain | `big-pickle` (default), plus rotating free models such as `deepseek-v4-flash-free`, `mimo-v2.5-free` | Generates natural live replies |
+
+Zen is chat-only: pair it with Groq (or another provider) for STT and TTS.
+Set `OPENCODE_API_KEY` in the environment (or pass it via `run.bat`) and run:
+
+```
+cd pc/pc-gateway
+set AGENTCALL_QUALIFICATION_PHONE=+15551234567
+set AGENTCALL_QUALIFICATION_CALL_APPROVED=yes
+set AGENTCALL_BRAIN_PROVIDER=opencode
+npm run ai:call
+```
+
+`AGENTCALL_BRAIN_PROVIDER` accepts `groq`, `opencode`, or `openai`; keys are
+read from the environment first, then from saved Speech settings. The Zen
+responder is available to agents as `OpenCodeConversationResponder`
+(`https://opencode.ai/zen/v1/chat/completions`, OpenAI-compatible) — see
+`pc/pc-gateway/src/opencode-conversation-responder.js`. The free catalog
+rotates; any well-formed model id is accepted.
 
 ## Hermes / OpenClaw MCP
 
