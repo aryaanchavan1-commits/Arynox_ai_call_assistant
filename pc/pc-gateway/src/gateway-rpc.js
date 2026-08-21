@@ -18,11 +18,13 @@ const PROVIDER_MODELS = Object.freeze({
       'whisper-1',
     ]),
     elevenlabs: Object.freeze(['scribe_v2_realtime']),
+    groq: Object.freeze(['whisper-large-v3-turbo', 'whisper-large-v3', 'distil-whisper-large-v3-en']),
   }),
   tts: Object.freeze({
     supertonic: Object.freeze(['supertonic-3']),
     elevenlabs: Object.freeze(['eleven_flash_v2_5', 'eleven_multilingual_v2', 'eleven_v3']),
     openai: Object.freeze(['gpt-4o-mini-tts-2025-12-15', 'gpt-4o-mini-tts', 'tts-1', 'tts-1-hd']),
+    groq: Object.freeze(['playai-tts', 'playai-tts-arabic', 'canopylabs/orpheus-v1-english', 'canopylabs/orpheus-arabic-saudi']),
   }),
 });
 const LANGUAGE_RE = /^[a-z]{2,3}$/;

@@ -1,8 +1,21 @@
-# AgentCall PC Gateway
+# Arynox AI Call Assistant — PC Gateway
 
-USB-only PC call-control gateway and local stdio MCP server. No provider, SIP,
-RTP, LAN, Wi-Fi, or remote MCP transport. Device traffic uses existing
-`adb forward` loopback connection.
+USB-only PC call-control gateway and local stdio MCP server, made by
+**Aryan Chavan · ArynoxTech**. No provider, SIP, RTP, LAN, Wi-Fi, or remote MCP
+transport. Device traffic uses existing `adb forward` loopback connection.
+Extends AgentCall with native **Groq** speech and conversation models.
+
+## Groq support
+
+- STT: `groq-realtime-stt-provider.js` buffers 16 kHz turns into WAV and
+  transcribes with Whisper (`whisper-large-v3-turbo`, `whisper-large-v3`,
+  `distil-whisper-large-v3-en`).
+- TTS: `groq-tts-provider.js` synthesizes with PlayAI / Orpheus models and
+  decodes WAV PCM16.
+- Conversation: `groq-conversation-responder.js` drives Llama chat models
+  (`llama-3.3-70b-versatile` and more) with bounded history and abort handling.
+- Config: `GROQ_API_KEY` secret, wired through `provider-settings.js`,
+  `realtime-registry.js`, and the desktop Speech UI.
 
 ## Safety model
 

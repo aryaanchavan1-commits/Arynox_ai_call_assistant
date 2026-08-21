@@ -51,3 +51,6 @@ __pycache__/
 .idea/
 *.iml
 .vscode/
+
+# Arynox local runtime data (recordings, provider settings, controller secrets)
+/data/

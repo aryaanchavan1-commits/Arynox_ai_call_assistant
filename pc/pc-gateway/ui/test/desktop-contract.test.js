@@ -165,7 +165,7 @@ test('renderer contains required routes, panes, and honest production states', (
   const app = read('renderer/app.js');
   const combined = `${html}\n${app}`;
 
-  assert.match(html, /<div class="brand" aria-label="AgentCall"><img src="assets\/agentcall-icon\.png" alt=""><\/div>/);
+  assert.match(html, /<div class="brand" aria-label="Arynox AI Call Assistant by Aryan Chavan"><img src="assets\/agentcall-icon\.png" alt=""><\/div>/);
   assert.match(app, /agentcall:\s*'assets\/agentcall-icon\.png'/);
   assert.ok(fs.existsSync(path.join(ROOT, 'renderer/assets/agentcall-icon.png')));
   const css = read('renderer/styles.css');

@@ -1,5 +1,7 @@
 import { ElevenLabsRealtimeSttProvider } from './elevenlabs-realtime-stt-provider.js';
 import { ElevenLabsTtsProvider } from './elevenlabs-tts-provider.js';
+import { GroqRealtimeSttProvider } from './groq-realtime-stt-provider.js';
+import { GroqTtsProvider } from './groq-tts-provider.js';
 import { OpenAiRealtimeSttProvider } from './openai-realtime-stt-provider.js';
 import { OpenAiTtsProvider } from './openai-tts-provider.js';
 import { SupertonicTtsProvider } from './supertonic-provider.js';
@@ -78,6 +80,8 @@ export function createRealtimeRegistry(config, env = process.env, { artifactPath
     sttProviders.set('elevenlabs', new ElevenLabsRealtimeSttProvider({
       apiKey: secret(env, 'ELEVENLABS_API_KEY'), model: config.sttModel, zeroRetention: config.elevenLabsZeroRetention === true,
     }));
+  } else if (config.sttProvider === 'groq') {
+    sttProviders.set('groq', new GroqRealtimeSttProvider({ apiKey: secret(env, 'GROQ_API_KEY'), model: config.sttModel }));
   }
   if (config.ttsProvider === 'openai') {
     ttsProviders.set('openai', new OpenAiTtsProvider({ apiKey: secret(env, 'OPENAI_API_KEY'), model: config.ttsModel }));
@@ -87,6 +91,8 @@ export function createRealtimeRegistry(config, env = process.env, { artifactPath
     }));
   } else if (config.ttsProvider === 'supertonic') {
     ttsProviders.set('supertonic', new SupertonicTtsProvider({ model: config.ttsModel }));
+  } else if (config.ttsProvider === 'groq') {
+    ttsProviders.set('groq', new GroqTtsProvider({ apiKey: secret(env, 'GROQ_API_KEY'), model: config.ttsModel }));
   }
   const selectedTts = ttsProviders.get(config.ttsProvider);
   if (selectedTts) {

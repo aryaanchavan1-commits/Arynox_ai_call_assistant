@@ -1,14 +1,14 @@
 {
-  "name": "agentcall-desktop",
+  "name": "arynox-ai-call-assistant-desktop",
   "version": "1.0.1",
   "private": true,
-  "description": "Secure daemon-backed Electron operations client for the USB-only AgentCall cellular agent gateway.",
-  "homepage": "https://github.com/sidinsearch/AgentCall",
+  "description": "Secure daemon-backed Electron operations client for the USB-only Arynox AI Call Assistant cellular agent gateway.",
+  "homepage": "https://github.com/aryaanchavan1-commits/Arynox_ai_call_assistant",
   "author": {
-    "name": "sidinsearch",
-    "email": "siddhushinde788@gmail.com"
+    "name": "Aryan Chavan",
+    "email": "aryaanchavan1@gmail.com"
   },
-  "desktopName": "agentcall-desktop",
+  "desktopName": "arynox-ai-call-assistant-desktop",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
@@ -28,8 +28,8 @@
     "ws": "8.21.1"
   },
   "build": {
-    "appId": "dev.sidx.agentcall.desktop",
-    "productName": "AgentCall Desktop",
+    "appId": "dev.arynoxtech.ai.call.assistant",
+    "productName": "Arynox AI Call Assistant",
     "asar": true,
     "files": [
       "electron/**/*",
@@ -50,17 +50,18 @@
         "deb"
       ],
       "category": "Network",
-      "maintainer": "sidinsearch <siddhushinde788@gmail.com>",
+      "maintainer": "Aryan Chavan <aryaanchavan1@gmail.com>",
       "syncDesktopName": true,
       "icon": "build/icons",
-      "artifactName": "agentcall-desktop-${version}-${arch}.${ext}"
+      "artifactName": "arynox-ai-call-assistant-${version}-${arch}.${ext}"
     },
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        "zip"
       ],
       "icon": "build/icon.ico",
-      "artifactName": "agentcall-desktop-${version}-${arch}-setup.${ext}",
+      "artifactName": "arynox-ai-call-assistant-${version}-${arch}.${ext}",
       "extraResources": [
         {
           "from": "../src",
@@ -97,7 +98,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "AgentCall Desktop"
+      "shortcutName": "Arynox AI Call Assistant"
     },
     "deb": {
       "depends": [

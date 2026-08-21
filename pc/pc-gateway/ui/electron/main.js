@@ -29,12 +29,12 @@ const ROUTES = Object.freeze([
   ['Policy', 'CommandOrControl+8', 'policy'],
   ['Settings', 'CommandOrControl+,', 'settings'],
 ]);
-const PROJECT_URL = 'https://github.com/sidinsearch/AgentCall';
+const PROJECT_URL = 'https://github.com/aryaanchavan1-commits/Arynox_ai_call_assistant';
 
 export function buildApplicationMenu(navigate) {
   return [
     {
-      label: 'AgentCall',
+      label: 'Arynox AI Call Assistant',
       submenu: [
         ...ROUTES.map(([label, accelerator, route]) => ({ label, accelerator, click: () => navigate(route) })),
         { type: 'separator' },
@@ -174,7 +174,7 @@ export async function startElectron() {
   const rendererPath = path.resolve(here, '../renderer/index.html');
   const rendererUrl = pathToFileURL(rendererPath).href;
 
-  app.setPath('userData', path.join(app.getPath('appData'), 'agentcall-desktop'));
+  app.setPath('userData', process.env.ARYNOX_USER_DATA_DIR || path.join(app.getPath('appData'), 'agentcall-desktop'));
   registerRecordingMediaScheme(protocol);
   await app.whenReady();
   if (!app.requestSingleInstanceLock()) {

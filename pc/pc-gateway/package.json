@@ -1,9 +1,9 @@
 {
-  "name": "@sidinsearch/agentcall-pc-gateway",
-  "version": "0.1.0",
+  "name": "@arynoxtech/arynox-ai-call-assistant-pc-gateway",
+  "version": "1.0.1",
   "private": true,
   "license": "AGPL-3.0-only",
-  "description": "AgentCall USB-only PC gateway and local MCP server for cellular calling. No SIP/RTP/Asterisk/STUN/LAN/Wi-Fi/WSS.",
+  "description": "Arynox AI Call Assistant by Aryan Chavan - USB-only PC gateway and local MCP server for AI cellular calling. No SIP/RTP/Asterisk/STUN/LAN/Wi-Fi/WSS.",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -23,6 +23,7 @@
   "scripts": {
     "test": "node --test --test-reporter=spec test/*.test.js",
     "check": "node scripts/check.mjs test/*.test.js",
+    "web": "node scripts/web-host.mjs",
     "qualify:live-conversation": "node scripts/live-conversation-qualification.js",
     "qualify:hermes-voice": "node scripts/hermes-voice-supervisor.js"
   },

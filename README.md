@@ -1,27 +1,30 @@
 <div align="center">
-  <img src="docs/assets/agentcall-icon.png" width="128" alt="AgentCall application icon">
-  <h1>AgentCall</h1>
+  <img src="docs/assets/agentcall-icon.png" width="128" alt="Arynox AI Call Assistant application icon">
+  <h1>Arynox AI Call Assistant</h1>
   <p><strong>Private, USB-only cellular calling for local AI agents.</strong></p>
-  <p>Turn a rooted Android phone into a secure voice endpoint for Hermes, OpenClaw, and Human Desktop Operators.</p>
+  <p>Turn a rooted Android phone into a secure voice endpoint for Groq, Hermes, OpenClaw, and Human Desktop Operators.</p>
 
   <p>
-    <a href="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml"><img src="https://github.com/sidinsearch/AgentCall/actions/workflows/verify.yml/badge.svg?branch=main" alt="Verify status"></a>
-    <a href="https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.1"><img src="https://img.shields.io/badge/AgentCall-v1.0.1-00A896.svg" alt="AgentCall v1.0.1"></a>
-    <a href="docs/RELEASE_STATUS.md"><img src="https://img.shields.io/badge/Hardware-qualified-00A896.svg" alt="Hardware-qualified"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/Made%20by-Aryan%20Chavan%20%C2%B7%20ArynoxTech-00A896.svg" alt="Made by Aryan Chavan · ArynoxTech"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/AGPL-3.0-2563EB.svg" alt="AGPL 3.0"></a>
   </p>
 
   <p>
-    <a href="https://github.com/sidinsearch/AgentCall/releases/latest"><strong>Download</strong></a>
-    · <a href="docs/INSTALL.md"><strong>Installation</strong></a>
+    <a href="docs/INSTALL.md"><strong>Installation</strong></a>
     · <a href="docs/ARCHITECTURE.md"><strong>Architecture</strong></a>
     · <a href="docs/MCP.md"><strong>MCP guide</strong></a>
     · <a href="docs/security/threat-model-and-recording-controls.md"><strong>Security</strong></a>
   </p>
 </div>
 
+> [!NOTE]
+> Arynox AI Call Assistant is a fork of the [AgentCall](https://github.com/sidinsearch/AgentCall)
+> project, extended with Groq speech and language models, and maintained by
+> **Aryan Chavan · ArynoxTech**. Internal protocol identifiers, package names,
+> and service identifiers retain the stable `agentcall` names for safe upgrades.
+
 > [!IMPORTANT]
-> AgentCall v1.0.1 is the current **hardware-qualified patch release** for the
+> Arynox AI Call Assistant v1.0.1 is the current **hardware-qualified patch release** for the
 > Xiaomi POCO M2 Pro reference setup. The Android APK and matched Magisk
 > module use the protected AgentCall production signing identity. The Windows
 > installer is not Authenticode signed, and the Debian package is not
@@ -31,16 +34,17 @@
 
 ## Overview
 
-AgentCall connects an Android default-dialer application to a Windows or Linux
-desktop through one authenticated USB cable. It supports real cellular calls,
+Arynox AI Call Assistant connects an Android default-dialer application to a Windows or
+Linux desktop through one authenticated USB cable. It supports real cellular calls,
 PC microphone and speaker mode, realtime STT/TTS, local recordings, phone-data
-synchronization, and semantic call control from Hermes or OpenClaw over MCP.
+synchronization, and semantic call control from Groq, Hermes, or OpenClaw over MCP.
 
-| Capability | What AgentCall provides |
+| Capability | What Arynox AI Call Assistant provides |
 |---|---|
 | Real cellular calling | Incoming and outgoing calls through the phone's SIM—no VoIP account required |
-| Local agent control | A local stdio MCP server for Hermes and OpenClaw |
-| Realtime voice | OpenAI or ElevenLabs STT with ElevenLabs, OpenAI, or local Supertonic TTS |
+| Local agent control | A local stdio MCP server for Hermes, OpenClaw, and Groq-powered agents |
+| Realtime voice | Groq, OpenAI, or ElevenLabs STT with Groq, ElevenLabs, OpenAI, or local Supertonic TTS |
+| AI conversation brain | Groq Llama chat models for natural live-call replies |
 | Human desktop mode | Talk through the PC microphone and speakers |
 | Private phone data | Local contacts, call history, recordings, and consent-bound caller context |
 | Fail-closed operation | Calls stop at policy, identity, recording, or provider-health failures |
@@ -119,11 +123,12 @@ interfaces. See the full [architecture](docs/ARCHITECTURE.md) and
 
 <table>
   <tr>
-    <td align="center" width="20%"><img src="docs/assets/brands/hermes-agent.png" height="58" alt="Hermes Agent"><br><strong>Hermes Agent</strong><br><sub>Local reasoning and call control</sub></td>
-    <td align="center" width="20%"><img src="docs/assets/brands/openclaw.svg" height="58" alt="OpenClaw"><br><strong>OpenClaw</strong><br><sub>Local reasoning and call control</sub></td>
-    <td align="center" width="20%"><img src="docs/assets/brands/openai-readme.svg" height="58" alt="OpenAI"><br><strong>OpenAI</strong><br><sub>Realtime transcription and speech</sub></td>
-    <td align="center" width="20%"><img src="docs/assets/brands/elevenlabs.png" height="58" alt="ElevenLabs"><br><strong>ElevenLabs</strong><br><sub>Realtime transcription and speech</sub></td>
-    <td align="center" width="20%"><img src="docs/assets/brands/supertonic-symbol.svg" height="58" alt="Supertonic"><br><strong>Supertonic</strong><br><sub>Local text to speech</sub></td>
+    <td align="center" width="16%"><img src="docs/assets/brands/hermes-agent.png" height="58" alt="Hermes Agent"><br><strong>Hermes Agent</strong><br><sub>Local reasoning and call control</sub></td>
+    <td align="center" width="16%"><img src="docs/assets/brands/openclaw.svg" height="58" alt="OpenClaw"><br><strong>OpenClaw</strong><br><sub>Local reasoning and call control</sub></td>
+    <td align="center" width="16%"><img src="docs/assets/brands/groq.svg" height="58" alt="Groq"><br><strong>Groq</strong><br><sub>Realtime Whisper STT, PlayAI/Orpheus TTS, Llama conversation</sub></td>
+    <td align="center" width="16%"><img src="docs/assets/brands/openai-readme.svg" height="58" alt="OpenAI"><br><strong>OpenAI</strong><br><sub>Realtime transcription and speech</sub></td>
+    <td align="center" width="16%"><img src="docs/assets/brands/elevenlabs.png" height="58" alt="ElevenLabs"><br><strong>ElevenLabs</strong><br><sub>Realtime transcription and speech</sub></td>
+    <td align="center" width="16%"><img src="docs/assets/brands/supertonic-symbol.svg" height="58" alt="Supertonic"><br><strong>Supertonic</strong><br><sub>Local text to speech</sub></td>
   </tr>
 </table>
 
@@ -301,8 +306,9 @@ Open **AgentCall Desktop → Speech**.
 
 | Function | Supported providers |
 |---|---|
-| Speech to text | OpenAI realtime transcription, ElevenLabs Scribe realtime |
-| Text to speech | ElevenLabs streaming TTS, OpenAI TTS, local Supertonic |
+| Speech to text | Groq Whisper, OpenAI realtime transcription, ElevenLabs Scribe realtime |
+| Text to speech | Groq PlayAI / Orpheus, ElevenLabs streaming TTS, OpenAI TTS, local Supertonic |
+| AI conversation | Groq Llama chat models (llama-3.3-70b-versatile and more) |
 
 Provider keys are write-only: the desktop renderer and MCP server cannot read
 them back. Changing the TTS provider, model, voice, or language invalidates the
@@ -312,6 +318,24 @@ Linux administrators may configure `/etc/agentcall/gateway.env` directly. Keep
 it owned by `root:agentcall`, mode `0640`, and never place provider keys in Git,
 MCP configuration, screenshots, or command arguments. See the
 [provider contract](docs/realtime-provider-contract.md).
+
+## Groq models (ArynoxTech)
+
+Arynox AI Call Assistant ships native Groq support so a single
+[Groq API key](https://console.groq.com/keys) can power the whole voice loop:
+
+| Function | Groq model | Role |
+|---|---|---|
+| Speech to text | `whisper-large-v3-turbo`, `whisper-large-v3`, `distil-whisper-large-v3-en` | Transcribes the caller |
+| Text to speech | `playai-tts`, `playai-tts-arabic`, `canopylabs/orpheus-v1-english`, `canopylabs/orpheus-arabic-saudi` | Speaks as the agent |
+| Conversation brain | `llama-3.3-70b-versatile` and other Llama chat models | Generates natural live replies |
+
+Select **Groq** in **Desktop → Speech** for STT, TTS, or both, enter your
+`gsk_...` key, and save. The gateway stores the key write-only. The Groq
+conversation responder is available to agents as
+`GroqConversationResponder` (chat completions with bounded history, timeout,
+and abort handling) — see `pc/pc-gateway/src/groq-conversation-responder.js`.
+Never put your Groq key in Git, MCP config, screenshots, or command arguments.
 
 ## Hermes / OpenClaw MCP
 

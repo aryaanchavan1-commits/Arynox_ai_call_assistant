@@ -326,6 +326,7 @@ function brandMark(name) {
     hermes: 'assets/hermes-agent.png',
     openclaw: 'assets/openclaw.svg',
     supertonic: 'assets/supertonic-symbol.svg',
+    groq: 'assets/groq.svg',
     agentcall: 'assets/agentcall-icon.png',
   }[name];
   if (officialAsset) {
@@ -540,6 +541,11 @@ const providerOptions = Object.freeze({
       { value: 'whisper-1', label: 'Whisper-1' },
     ]), needsCredential: true, icon: 'openai' }),
     elevenlabs: Object.freeze({ label: 'ElevenLabs', models: Object.freeze([{ value: 'scribe_v2_realtime', label: 'Scribe v2 Realtime' }]), needsCredential: true, icon: 'elevenlabs' }),
+    groq: Object.freeze({ label: 'Groq', models: Object.freeze([
+      { value: 'whisper-large-v3-turbo', label: 'Whisper Large v3 Turbo' },
+      { value: 'whisper-large-v3', label: 'Whisper Large v3' },
+      { value: 'distil-whisper-large-v3-en', label: 'Distil Whisper Large v3 (EN)' },
+    ]), needsCredential: true, icon: 'groq' }),
   }),
   tts: Object.freeze({
     supertonic: Object.freeze({ label: 'Supertonic', models: Object.freeze([{ value: 'supertonic-3', label: 'Supertonic 3' }]), needsCredential: false, icon: 'supertonic' }),
@@ -554,6 +560,12 @@ const providerOptions = Object.freeze({
       { value: 'tts-1', label: 'TTS-1' },
       { value: 'tts-1-hd', label: 'TTS-1 HD' },
     ]), needsCredential: true, icon: 'openai' }),
+    groq: Object.freeze({ label: 'Groq', models: Object.freeze([
+      { value: 'playai-tts', label: 'PlayAI TTS (EN)' },
+      { value: 'playai-tts-arabic', label: 'PlayAI TTS (AR)' },
+      { value: 'canopylabs/orpheus-v1-english', label: 'Orpheus English' },
+      { value: 'canopylabs/orpheus-arabic-saudi', label: 'Orpheus Arabic (Saudi)' },
+    ]), needsCredential: true, icon: 'groq' }),
   }),
 });
 
@@ -571,6 +583,12 @@ const languageOptions = Object.freeze([
 const voiceOptions = Object.freeze({
   supertonic: Object.freeze(['F1', 'F2', 'F3', 'F4', 'F5', 'M1', 'M2', 'M3', 'M4', 'M5'].map((value) => Object.freeze({ value, label: value }))),
   openai: Object.freeze(['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'nova', 'onyx', 'sage', 'shimmer', 'verse', 'marin', 'cedar'].map((value) => Object.freeze({ value, label: value[0].toUpperCase() + value.slice(1) }))),
+  groq: Object.freeze([
+    'Arista-PlayAI', 'Atlas-PlayAI', 'Celeste-PlayAI', 'Chip-PlayAI', 'Daniel-PlayAI',
+    'Ethan-PlayAI', 'Fritz-PlayAI', 'Jennifer-PlayAI', 'Nancy-PlayAI', 'Rachel-PlayAI',
+    'austin', 'brady', 'chloe', 'edward', 'emily', 'hannah', 'james', 'jessica',
+    'john', 'julie', 'matthew', 'mike', 'rick', 'sam', 'steve', 'troy',
+  ].map((value) => Object.freeze({ value, label: value }))),
 });
 
 function field(labelText, control) {
@@ -766,7 +784,8 @@ function createSpeechCard(kind, status) {
     if (!metadata.needsCredential) credential.value = '';
     if (kind === 'tts') {
       const providerDefaultVoice = provider.value === 'openai' ? 'alloy'
-        : provider.value === 'supertonic' ? 'F1' : '';
+        : provider.value === 'supertonic' ? 'F1'
+          : provider.value === 'groq' ? 'Arista-PlayAI' : '';
       const previousVoice = provider.value === status.provider
         ? status.voice || providerDefaultVoice
         : providerDefaultVoice;
@@ -1037,7 +1056,7 @@ async function renderSettings() {
   addStatusRow(storage, 'Credential display', 'Never');
   addStatusRow(storage, 'Release', '1.0.1');
   const project = setupCard(
-    'AgentCall on GitHub',
+    'Arynox AI Call Assistant on GitHub',
     'Read the setup guide, download releases, report issues, and contribute to the project.',
   );
   project.classList.add('project-card');
@@ -1051,9 +1070,9 @@ async function renderSettings() {
   projectIcon.append(projectIconUse);
   const projectCopy = document.createElement('span');
   const projectName = document.createElement('strong');
-  projectName.textContent = 'sidinsearch / AgentCall';
+  projectName.textContent = 'aryaanchavan1-commits / Arynox_ai_call_assistant';
   const projectHint = document.createElement('small');
-  projectHint.textContent = 'Open the repository in your browser \u2197';
+  projectHint.textContent = 'Made by Aryan Chavan \u00b7 ArynoxTech \u2197';
   projectCopy.append(projectName, projectHint);
   projectLink.append(projectIcon, projectCopy);
   projectLink.addEventListener('click', async () => {

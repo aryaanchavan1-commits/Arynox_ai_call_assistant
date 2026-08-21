@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AgentCall</string>
+    <string name="app_name">Arynox AI Call Assistant</string>
     <string name="unknown_caller">Unknown caller</string>
     <string name="incoming_call">Incoming call</string>
     <string name="calling">Calling…</string>
@@ -39,5 +39,5 @@
     <string name="dialer_status_desktop_connected_recording_unavailable">Desktop connected · recording unavailable</string>
     <string name="dialer_status_phone_available_gateway_not_ready">Phone available · gateway not ready</string>
     <string name="project">Project</string>
-    <string name="agentcall_on_github">AgentCall on GitHub</string>
+    <string name="agentcall_on_github">Arynox AI Call Assistant on GitHub</string>
 </resources>

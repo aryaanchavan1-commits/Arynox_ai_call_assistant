@@ -67,14 +67,32 @@ const ELEVEN_MULTILINGUAL_LANGUAGES = Object.freeze([
 ]);
 const ELEVEN_FLASH_LANGUAGES = Object.freeze([...ELEVEN_MULTILINGUAL_LANGUAGES, 'hu', 'no', 'vi']);
 const SUPERTONIC_LANGUAGES = Object.freeze(['en', 'ko', 'es', 'pt', 'fr', 'na']);
+const GROQ_WHISPER_LANGUAGES = OPENAI_TRANSCRIPTION_LANGUAGES;
+const GROQ_PLAYAI_VOICES = Object.freeze([
+  'Arista-PlayAI', 'Atlas-PlayAI', 'Celeste-PlayAI', 'Chip-PlayAI',
+  'Daniel-PlayAI', 'Ethan-PlayAI', 'Fritz-PlayAI', 'Jennifer-PlayAI',
+  'Nancy-PlayAI', 'Rachel-PlayAI',
+]);
+const GROQ_ORPHEUS_VOICES = Object.freeze([
+  'austin', 'brady', 'chloe', 'edward', 'emily', 'hannah', 'james',
+  'jessica', 'john', 'julie', 'matthew', 'mike', 'rick', 'sam',
+  'steve', 'troy',
+]);
 const CATALOG_LANGUAGES = Object.freeze({
   stt: Object.freeze({
     openai: OPENAI_TRANSCRIPTION_LANGUAGES,
     elevenlabs: ELEVEN_STT_LANGUAGES,
+    groq: GROQ_WHISPER_LANGUAGES,
   }),
   tts: Object.freeze({
     supertonic: SUPERTONIC_LANGUAGES,
     openai: OPENAI_TRANSCRIPTION_LANGUAGES,
+    groq: Object.freeze({
+      'playai-tts': ['en'],
+      'playai-tts-arabic': ['ar'],
+      'canopylabs/orpheus-v1-english': ['en'],
+      'canopylabs/orpheus-arabic-saudi': ['ar'],
+    }),
     elevenlabs: Object.freeze({
       eleven_flash_v2_5: ELEVEN_FLASH_LANGUAGES,
       eleven_multilingual_v2: ELEVEN_MULTILINGUAL_LANGUAGES,
@@ -85,6 +103,7 @@ const CATALOG_LANGUAGES = Object.freeze({
 const CATALOG_VOICES = Object.freeze({
   openai: Object.freeze(['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'nova', 'onyx', 'sage', 'shimmer', 'verse', 'marin', 'cedar']),
   supertonic: Object.freeze(['F1', 'F2', 'F3', 'F4', 'F5', 'M1', 'M2', 'M3', 'M4', 'M5']),
+  groq: Object.freeze([...GROQ_PLAYAI_VOICES, ...GROQ_ORPHEUS_VOICES]),
 });
 const PROVIDERS = Object.freeze({
   stt: Object.freeze({
@@ -99,6 +118,11 @@ const PROVIDERS = Object.freeze({
       secret: 'OPENAI_API_KEY',
     }),
     elevenlabs: Object.freeze({ defaultModel: 'scribe_v2_realtime', models: Object.freeze(['scribe_v2_realtime']), secret: 'ELEVENLABS_API_KEY' }),
+    groq: Object.freeze({
+      defaultModel: 'whisper-large-v3-turbo',
+      models: Object.freeze(['whisper-large-v3-turbo', 'whisper-large-v3', 'distil-whisper-large-v3-en']),
+      secret: 'GROQ_API_KEY',
+    }),
   }),
   tts: Object.freeze({
     supertonic: Object.freeze({ defaultModel: 'supertonic-3', models: Object.freeze(['supertonic-3']), secret: null }),
@@ -111,6 +135,11 @@ const PROVIDERS = Object.freeze({
       defaultModel: 'gpt-4o-mini-tts-2025-12-15',
       models: Object.freeze(['gpt-4o-mini-tts-2025-12-15', 'gpt-4o-mini-tts', 'tts-1', 'tts-1-hd']),
       secret: 'OPENAI_API_KEY',
+    }),
+    groq: Object.freeze({
+      defaultModel: 'playai-tts',
+      models: Object.freeze(['playai-tts', 'playai-tts-arabic', 'canopylabs/orpheus-v1-english', 'canopylabs/orpheus-arabic-saudi']),
+      secret: 'GROQ_API_KEY',
     }),
   }),
 });
@@ -496,6 +525,20 @@ export class ProviderSettingsStore {
       }
       if (provider === 'openai') {
         const response = await fetchCatalog('https://api.openai.com/v1/models', {
+          method: 'GET',
+          headers: { authorization: `Bearer ${entry.apiKey}`, accept: 'application/json' },
+          signal: controller.signal,
+        });
+        if (!response?.ok) return { ...base, modelState: 'unavailable' };
+        const models = availableModels(await response.json(), definition.models);
+        return {
+          ...base,
+          models: models.length > 0 ? models : base.models,
+          modelState: models.length > 0 ? 'provider' : 'unavailable',
+        };
+      }
+      if (provider === 'groq') {
+        const response = await fetchCatalog('https://api.groq.com/openai/v1/models', {
           method: 'GET',
           headers: { authorization: `Bearer ${entry.apiKey}`, accept: 'application/json' },
           signal: controller.signal,
