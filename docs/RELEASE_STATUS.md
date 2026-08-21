@@ -1,4 +1,4 @@
-# AgentCall release status
+# Arynox release status
 
 Updated: 2026-08-02
 
@@ -51,7 +51,7 @@ See
 
 - Final unified Debian installed and services active.
 - Phone authenticated and gateway phase `ready`.
-- GNOME resolves the packaged AgentCall launcher icon from standard 16 through
+- GNOME resolves the packaged Arynox launcher icon from standard 16 through
   512 px hicolor entries instead of falling back to a generic gear.
 - The packaged desktop played a verified WAV in-app, saved a 1,602,638-byte
   copy through the native dialog, and synchronized the same finalized

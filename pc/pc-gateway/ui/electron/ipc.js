@@ -376,7 +376,7 @@ export function createIpcHandlers({
           }
           if (request.action === 'save') {
             if (typeof saveFile !== 'function') throw new Error('recording save unavailable');
-            const result = await saveFile(canonicalArtifact, `AgentCall-${request.callId}${pathApi.extname(artifact)}`);
+            const result = await saveFile(canonicalArtifact, `Arynox-${request.callId}${pathApi.extname(artifact)}`);
             audit({ channel: 'action:recording', action: 'save', callId: request.callId, fixture: false });
             return { accepted: result?.saved === true, canceled: result?.canceled === true, action: 'save', callId: request.callId };
           }

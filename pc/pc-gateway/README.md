@@ -3,7 +3,7 @@
 USB-only PC call-control gateway and local stdio MCP server, made by
 **Aryan Chavan · ArynoxTech**. No provider, SIP, RTP, LAN, Wi-Fi, or remote MCP
 transport. Device traffic uses existing `adb forward` loopback connection.
-Extends AgentCall with native **Groq** speech and conversation models.
+Extends Arynox with native **Groq** speech and conversation models.
 
 ## Groq support
 
@@ -68,11 +68,11 @@ Every input schema is strict with `additionalProperties: false`. `destination`
 is strict E.164. `digits` accepts only `0-9`, `*`, `#`, and `A-D`.
 `wait_for_turn` is an event-driven cursor: pass the returned `sequence` into
 the next call so Hermes/OpenClaw receives every final caller turn once without
-polling. By default, AgentCall may play one short context-aware acknowledgement
+polling. By default, Arynox may play one short context-aware acknowledgement
 after 650 milliseconds; pass `autoAcknowledge: false` when the external loop
 supplies its own latency bridge. A quick `speak` cancels it, greetings and
 goodbyes never trigger it, and an eight-second limiter prevents repetition.
-AgentCall also plays an unused warmed reply automatically when the caller's
+Arynox also plays an unused warmed reply automatically when the caller's
 meaning is a strong match. A receipt with `preparedReplySpoken: true` means the
 reply already reached the call: do not call `speak` for that sequence; wait for
 the next turn. Pass `autoPreparedReply: false` to opt out.
@@ -85,10 +85,10 @@ until the call ends. Strong prepared matches are spoken automatically and
 reported in the wait receipt; unmatched turns remain with Hermes/OpenClaw.
 For live dialogue, pass the latest
 `wait_for_turn.sequence` as
-`respondingToSequence`; AgentCall rejects the draft if the caller has already
+`respondingToSequence`; Arynox rejects the draft if the caller has already
 started a newer turn.
 
-Each TTS stream has a three-second no-audio watchdog. AgentCall retries once
+Each TTS stream has a three-second no-audio watchdog. Arynox retries once
 only when no audio has reached the phone, then releases the speech slot and
 returns `speech provider unavailable` instead of leaving MCP blocked.
 Incoming and outgoing openings are protected continuous segments. Barge-in is

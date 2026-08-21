@@ -1,4 +1,4 @@
-# AgentCall Desktop
+# Arynox AI Call Assistant
 
 Secure Electron operations client for the USB-only cellular-agent gateway.
 
@@ -21,7 +21,7 @@ On Linux, those responsibilities remain inside the separately supervised `agentc
 
 ## Design
 
-The interface uses the shared AgentCall communications design system: a calm teal identity and responsive three-pane operations layout. Compact widths collapse call history before primary controls and stack setup/configuration cards.
+The interface uses the shared Arynox communications design system: a calm teal identity and responsive three-pane operations layout. Compact widths collapse call history before primary controls and stack setup/configuration cards.
 
 ## Development
 

@@ -111,7 +111,7 @@
     const playback = await playRecording(callId);
     const anchor = document.createElement('a');
     anchor.href = playback.mediaUrl;
-    anchor.download = `AgentCall-${callId}${playback.artifact.endsWith('.mkv') ? '.mkv' : '.wav'}`;
+    anchor.download = `Arynox-${callId}${playback.artifact.endsWith('.mkv') ? '.mkv' : '.wav'}`;
     document.body.append(anchor);
     anchor.click();
     anchor.remove();

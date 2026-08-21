@@ -1,6 +1,6 @@
-# Install and configure AgentCall
+# Install and configure Arynox
 
-This guide covers the current AgentCall hardware-qualified release candidate. Read [`RELEASE_STATUS.md`](RELEASE_STATUS.md) before installing privileged artifacts.
+This guide covers the current Arynox hardware-qualified release candidate. Read [`RELEASE_STATUS.md`](RELEASE_STATUS.md) before installing privileged artifacts.
 
 ## 1. Prerequisites
 
@@ -82,13 +82,13 @@ Confirm the expected package version `1.0.1 (333)`, requested/granted privileges
 
 For the Magisk path:
 
-1. disable/remove the AgentCall module in Magisk;
+1. disable/remove the Arynox module in Magisk;
 2. reboot;
 3. uninstall `com.callagent.gateway` normally if still present;
 4. restore the previous default dialer explicitly;
 5. verify normal mic/earpiece and cellular call behavior.
 
-## 4. Select AgentCall as default dialer
+## 4. Select Arynox as default dialer
 
 Open the Android app and follow its role prompt, or use Android Settings → Apps → Default apps → Phone app. Confirm:
 
@@ -121,11 +121,11 @@ Install Node.js 20 or newer from your distribution or trusted Node.js package so
 
 1. Connect exactly one supported phone over physical USB with USB debugging enabled.
 2. If Android displays its standard ADB host-authorization prompt, review it and approve this Linux controller.
-3. Open AgentCall on Android and press **Connect**.
+3. Open Arynox on Android and press **Connect**.
 4. Leave the cable attached while `gatewayd` discovers the one authorized device, checks the matched artifact identity, performs the bounded authenticated bootstrap and proves the resulting operational session.
-5. Open **AgentCall Desktop** and confirm that its setup state agrees with the Android screen.
+5. Open **Arynox AI Call Assistant** and confirm that its setup state agrees with the Android screen.
 
-No AgentCall credential is displayed, copied or typed. Do not manually configure an ADB serial, build fingerprint, ADB private-key path or controller secret. Missing, invalid or asymmetric trust state fails closed and requires the explicit **Forget Paired Desktop** / re-pair flow; normal authentication failure must never rotate authority silently.
+No Arynox credential is displayed, copied or typed. Do not manually configure an ADB serial, build fingerprint, ADB private-key path or controller secret. Missing, invalid or asymmetric trust state fails closed and requires the explicit **Forget Paired Desktop** / re-pair flow; normal authentication failure must never rotate authority silently.
 
 ## 7. Review gatewayd configuration
 
@@ -155,7 +155,7 @@ sudo /usr/bin/agentcall-logs
 
 ## 9. Launch and verify the desktop application
 
-Launch **AgentCall Desktop** from the application menu or run:
+Launch **Arynox AI Call Assistant** from the application menu or run:
 
 ```bash
 agentcall-desktop
@@ -163,7 +163,7 @@ agentcall-desktop
 
 The desktop should show live daemon, authenticated Android, recording and MCP status. It must never display fixture calls as real activity. The UI remains unprivileged; the included gateway continues to run as the separately supervised `agentcall` service account and communicates over the group-restricted local Unix socket.
 
-AgentCall must be the only application capturing cellular call audio on the
+Arynox must be the only application capturing cellular call audio on the
 dedicated phone. Disable BCR (`com.chiller3.bcr`) or any other call recorder
 before hardware qualification. Two recorders can make Android's in-call capture
 device return `Device or resource busy`; the visible symptom is an answered call
@@ -213,17 +213,17 @@ The MCP process uses stdio and talks to the local Unix RPC socket. It does not n
 
 OpenClaw uses the same stdio command. On Linux select `/usr/bin/agentcall-mcp`. On Windows copy the OS-specific `agentcall-mcp.cmd` launcher displayed on the desktop MCP page; do not substitute a Unix path.
 
-Expected semantic tools are `status`, `capabilities`, `wait_for_incoming_call`, `wait_for_turn`, `dial`, `prepare_speech`, `answer`, `reject`, `hangup`, `send_dtmf`, and `speak`. Resources use the canonical `agentcall://` namespace. An external Hermes/OpenClaw MCP session should generate a complete contextual opening and one to four likely complete replies before calling `dial`; AgentCall renders the opening before touching the phone, correlates the exact new outgoing call, waits for recording and realtime media readiness, automatically plays the opening once, and warms likely replies while the phone rings. When a caller turn matches a prepared reply, the client should pass that exact text unchanged to `speak` so the warmed audio is reused; unmatched turns remain live and context-aware. An accepted dial returns `nextAction: "wait_for_turn"` and `afterSequence: 0`; the agent must remain attached, alternate `wait_for_turn` and `speak`, and pass the latest turn `sequence` as `respondingToSequence` until the call ends. The context-matched latency bridge is enabled by default and can be disabled with `autoAcknowledge: false` when the external loop supplies its own bridge. It starts a short prewarmed acknowledgement after about 250 ms and may add one brief follow-up after about 2.2 seconds if the complete answer is still pending; both stages cancel on a quick response and serialize before the real answer. Speech rendering and pre-generation have a longer bounded local RPC deadline than quick control operations, preventing healthy multi-second TTS playback from surfacing as an MCP internal error. The managed Hermes voice supervisor uses the same low-latency bridge: AgentCall waits for the turn, sends it directly to a persistent AgentCall-only Hermes session, keeps the caller audibly engaged while Hermes thinks, and sends each concise, complete one-to-three-sentence answer through one continuous TTS request. This prevents sentence tails from being dropped and avoids a second TTS prosody restart. The spoken opening is carried into later prompts so the agent does not greet the caller twice. Rapid short transcript fragments receive a bounded continuation window, and transient agent failures receive audible recovery turns followed by a natural farewell if the agent remains unavailable. Unrelated coding rules and tools are not injected into this managed telephone session, while the user's selected model/provider and within-call context remain authoritative. A cross-turn cooldown prevents natural pauses from stacking filler speech. AgentCall paces provider audio onto the host-to-phone link at one 20 ms frame every 20 ms, while the Android bridge continuously supplies silent frames between utterances; this prevents a faster-than-real-time provider burst from overflowing the phone queue and leaving only the end of a greeting audible. The incoming receptionist generates morning, afternoon, evening, and neutral-night openings plus common name, message, urgency, callback, privacy, repeat, identity, and closing responses when AI pickup is enabled. The same selected-voice clips are reused for every caller, while unmatched answers continue through live Hermes. Saving new receptionist context or changing the selected TTS provider, model, voice, or language regenerates the prepared audio. Outgoing calls generate their context-specific plan before dialing and pre-render high-value replies while ringing. Both call directions keep the short 250 ms route guard but no longer attempt speech until the exact call's recording and realtime media are ready. Policy and recording health still control every action.
+Expected semantic tools are `status`, `capabilities`, `wait_for_incoming_call`, `wait_for_turn`, `dial`, `prepare_speech`, `answer`, `reject`, `hangup`, `send_dtmf`, and `speak`. Resources use the canonical `agentcall://` namespace. An external Hermes/OpenClaw MCP session should generate a complete contextual opening and one to four likely complete replies before calling `dial`; Arynox renders the opening before touching the phone, correlates the exact new outgoing call, waits for recording and realtime media readiness, automatically plays the opening once, and warms likely replies while the phone rings. When a caller turn matches a prepared reply, the client should pass that exact text unchanged to `speak` so the warmed audio is reused; unmatched turns remain live and context-aware. An accepted dial returns `nextAction: "wait_for_turn"` and `afterSequence: 0`; the agent must remain attached, alternate `wait_for_turn` and `speak`, and pass the latest turn `sequence` as `respondingToSequence` until the call ends. The context-matched latency bridge is enabled by default and can be disabled with `autoAcknowledge: false` when the external loop supplies its own bridge. It starts a short prewarmed acknowledgement after about 250 ms and may add one brief follow-up after about 2.2 seconds if the complete answer is still pending; both stages cancel on a quick response and serialize before the real answer. Speech rendering and pre-generation have a longer bounded local RPC deadline than quick control operations, preventing healthy multi-second TTS playback from surfacing as an MCP internal error. The managed Hermes voice supervisor uses the same low-latency bridge: Arynox waits for the turn, sends it directly to a persistent Arynox-only Hermes session, keeps the caller audibly engaged while Hermes thinks, and sends each concise, complete one-to-three-sentence answer through one continuous TTS request. This prevents sentence tails from being dropped and avoids a second TTS prosody restart. The spoken opening is carried into later prompts so the agent does not greet the caller twice. Rapid short transcript fragments receive a bounded continuation window, and transient agent failures receive audible recovery turns followed by a natural farewell if the agent remains unavailable. Unrelated coding rules and tools are not injected into this managed telephone session, while the user's selected model/provider and within-call context remain authoritative. A cross-turn cooldown prevents natural pauses from stacking filler speech. Arynox paces provider audio onto the host-to-phone link at one 20 ms frame every 20 ms, while the Android bridge continuously supplies silent frames between utterances; this prevents a faster-than-real-time provider burst from overflowing the phone queue and leaving only the end of a greeting audible. The incoming receptionist generates morning, afternoon, evening, and neutral-night openings plus common name, message, urgency, callback, privacy, repeat, identity, and closing responses when AI pickup is enabled. The same selected-voice clips are reused for every caller, while unmatched answers continue through live Hermes. Saving new receptionist context or changing the selected TTS provider, model, voice, or language regenerates the prepared audio. Outgoing calls generate their context-specific plan before dialing and pre-render high-value replies while ringing. Both call directions keep the short 250 ms route guard but no longer attempt speech until the exact call's recording and realtime media are ready. Policy and recording health still control every action.
 
 Current clients should treat `preparedReplySpoken: true` from `wait_for_turn` as
-an already completed response and immediately wait again. AgentCall selects
+an already completed response and immediately wait again. Arynox selects
 only strong, single-use prepared matches; pass `autoPreparedReply: false` to
 disable this. A three-second no-audio TTS watchdog retries once before any audio
 is sent, then releases the speech slot with `speech provider unavailable` so a
 provider stall cannot block the remaining call.
 
 Use the production conversation instruction and latency guidance in
-[`AGENT_VOICE_MODE.md`](AGENT_VOICE_MODE.md). AgentCall uses the user's current
+[`AGENT_VOICE_MODE.md`](AGENT_VOICE_MODE.md). Arynox uses the user's current
 Hermes/OpenClaw model by default and does not require a separate voice profile.
 
 ## 13. Verify the source build

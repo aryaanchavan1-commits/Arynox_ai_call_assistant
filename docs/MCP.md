@@ -1,9 +1,9 @@
-# AgentCall MCP guide
+# Arynox MCP guide
 
 ## Boundary
 
-AgentCall implements MCP protocol `2024-11-05` over local stdio. The MCP process
-connects to the local AgentCall gateway through a Unix socket on Linux or a
+Arynox implements MCP protocol `2024-11-05` over local stdio. The MCP process
+connects to the local Arynox gateway through a Unix socket on Linux or a
 named pipe on Windows.
 
 There is no MCP HTTP server and no remote listener. MCP does not carry audio,
@@ -21,7 +21,7 @@ hermes mcp list
 
 Windows:
 
-1. Open **AgentCall Desktop -> MCP**.
+1. Open **Arynox AI Call Assistant -> MCP**.
 2. Copy the displayed `agentcall-mcp.cmd` path.
 3. Register that exact path as a local stdio MCP command.
 4. Do not configure a URL or the Linux `/usr/bin` path.
@@ -47,7 +47,7 @@ OpenClaw uses the same stdio command definition.
 All schemas are strict and reject unknown fields. Mutations require bounded
 idempotency keys. `dial` requires strict E.164, explicit approval, recording
 consent, one complete context-specific opening, and one to four complete likely
-replies. AgentCall renders the opening before touching the phone, warms the
+replies. Arynox renders the opening before touching the phone, warms the
 likely replies while it rings, correlates the exact new call instead of a
 previous ended call, and plays the opening once only after recording and
 realtime media both report ready. Gateway policy remains authoritative.
@@ -56,7 +56,7 @@ An accepted `dial` returns `nextAction: "wait_for_turn"` and
 `afterSequence: 0`. Do not end the agent turn after dialing: remain attached to
 the call and alternate `wait_for_turn` and `speak` until `wait_for_turn` reports
 that the call ended. For live dialogue, pass the last `wait_for_turn.sequence` as
-`respondingToSequence`. AgentCall rejects a stale answer if the caller has
+`respondingToSequence`. Arynox rejects a stale answer if the caller has
 already begun a newer turn.
 
 ## Resources
@@ -115,7 +115,7 @@ handling starts as soon as that opening completes.
 1. The desktop operator explicitly enables **AI answers incoming calls** and
    saves bounded instructions.
 2. Call `wait_for_incoming_call` with a cursor.
-3. AgentCall returns an event only while the mode is enabled. It may include a
+3. Arynox returns an event only while the mode is enabled. It may include a
    saved contact name and consented expiring caller context.
 4. Answer only the returned call ID.
 5. Use `wait_for_turn` and `speak` as above.

@@ -110,7 +110,7 @@ test('provider health delegates only to the active registry and fails closed whe
 });
 
 test('provider pair test delegates only to the active registry and fails closed when inactive', async () => {
-  const result = { healthy: true, transcript: 'AgentCall speech test.', playbackPath: '/run/agentcall/provider-test.wav' };
+  const result = { healthy: true, transcript: 'Arynox speech test.', playbackPath: '/run/agentcall/provider-test.wav' };
   const { gateway } = runningGateway({ testProviders: async () => result });
   assert.deepEqual(await gateway.testProviders(), result);
   await assert.rejects(runningGateway().gateway.testProviders(), /realtime.*inactive/i);

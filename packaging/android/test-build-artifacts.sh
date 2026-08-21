@@ -29,14 +29,14 @@ PATH="$tmp/bin:$PATH" "$root/packaging/android/build-artifacts.sh" \
   --version-name 1.0.1 \
   --version-code 333
 
-apk="$tmp/out/AgentCall-1.0.1-333.apk"
-module="$tmp/out/AgentCall-privileged-1.0.1-333-magisk.zip"
+apk="$tmp/out/Arynox-1.0.1-333.apk"
+module="$tmp/out/Arynox-privileged-1.0.1-333-magisk.zip"
 test -f "$apk"
 test -f "$module"
 cmp -s "$fixture" "$apk"
 unzip -t "$module" >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'id=agentcall-privileged' >/dev/null
-unzip -p "$module" module.prop | grep -Fx 'name=AgentCall Privileged Telephony Bridge' >/dev/null
+unzip -p "$module" module.prop | grep -Fx 'name=Arynox Privileged Telephony Bridge' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'author=sidinsearch' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'version=1.0.1' >/dev/null
 unzip -p "$module" module.prop | grep -Fx 'versionCode=333' >/dev/null
@@ -47,7 +47,7 @@ if grep -Fx 'exit 0' "$tmp/update-binary" >/dev/null; then
   exit 1
 fi
 unzip -p "$module" customize.sh > "$tmp/customize.sh"
-grep -F 'Embedded AgentCall APK hash mismatch' "$tmp/customize.sh" >/dev/null
+grep -F 'Embedded Arynox APK hash mismatch' "$tmp/customize.sh" >/dev/null
 if grep -F '.replace-app' "$tmp/customize.sh" >/dev/null; then
   echo 'customize.sh must not schedule destructive package replacement' >&2
   exit 1
@@ -131,8 +131,8 @@ PATH="$tmp/bin:$PATH" "$root/packaging/android/build-artifacts.sh" \
   --version-name 1.0.1 \
   --version-code 333 >/dev/null
 for artifact in \
-  AgentCall-1.0.1-333.apk \
-  AgentCall-privileged-1.0.1-333-magisk.zip \
+  Arynox-1.0.1-333.apk \
+  Arynox-privileged-1.0.1-333-magisk.zip \
   ARTIFACT-STATUS.txt \
   ANDROID-ROLLBACK-MANIFEST.txt \
   SHA256SUMS; do

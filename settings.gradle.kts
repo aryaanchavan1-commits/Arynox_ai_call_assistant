@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AgentCall"
+rootProject.name = "Arynox"
 include(":app")
 include(":probe")
 include(":downlinkProbe")

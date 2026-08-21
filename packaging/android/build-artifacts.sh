@@ -67,9 +67,9 @@ apk_version_name=$(printf '%s\n' "$badging" | awk -F"'" '/^package: / { print $6
 mkdir -p "$out"
 out=$(CDPATH= cd -- "$out" && pwd)
 apk=$(CDPATH= cd -- "$(dirname -- "$apk")" && pwd)/$(basename -- "$apk")
-base="AgentCall-${version_name}-${version_code}"
+base="Arynox-${version_name}-${version_code}"
 normal_apk="$out/$base.apk"
-module_zip="$out/AgentCall-privileged-${version_name}-${version_code}-magisk.zip"
+module_zip="$out/Arynox-privileged-${version_name}-${version_code}-magisk.zip"
 cp "$apk" "$normal_apk"
 apk_hash=$(sha256sum "$normal_apk" | cut -d' ' -f1)
 
@@ -84,12 +84,12 @@ printf '#MAGISK\n' > "$stage/META-INF/com/google/android/updater-script"
 chmod 0755 "$stage/META-INF/com/google/android/update-binary"
 cat > "$stage/module.prop" <<EOF
 id=agentcall-privileged
-name=AgentCall Privileged Telephony Bridge
+name=Arynox Privileged Telephony Bridge
 version=$version_name
 versionCode=$version_code
 author=sidinsearch
-summary=Matched AgentCall APK with package-scoped activation for USB-only cellular audio
-description=Refreshes the matched AgentCall package, preserves app data and the dialer role, and grants only its declared protected telephony-audio permissions.
+summary=Matched Arynox APK with package-scoped activation for USB-only cellular audio
+description=Refreshes the matched Arynox package, preserves app data and the dialer role, and grants only its declared protected telephony-audio permissions.
 EOF
 cat > "$stage/system/etc/permissions/privapp-permissions-com.callagent.gateway.xml" <<'EOF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -118,15 +118,15 @@ fi
 expected='$apk_hash'
 actual=\$(sha256sum "\$MODPATH/system/priv-app/agentcall/agentcall.apk" | cut -d' ' -f1)
 if [ "\$actual" != "\$expected" ]; then
-  ui_print '! Embedded AgentCall APK hash mismatch'
+  ui_print '! Embedded Arynox APK hash mismatch'
   abort 'Refusing corrupted privileged module'
 fi
 rm -f "\$MODPATH/disable" "\$MODPATH/remove" "\$MODPATH/skip_mount"
 set_perm_recursive "\$MODPATH" 0 0 0755 0644
 set_perm "\$MODPATH/service.sh" 0 0 0755
 set_perm "\$MODPATH/uninstall.sh" 0 0 0755
-ui_print '- AgentCall APK hash verified'
-ui_print '- Existing AgentCall app will be refreshed from the bundled matched APK after reboot'
+ui_print '- Arynox APK hash verified'
+ui_print '- Existing Arynox app will be refreshed from the bundled matched APK after reboot'
 ui_print '- App data and the default-dialer role are preserved for same-signature upgrades'
 ui_print '- No separate APK installation is required'
 EOF
@@ -177,7 +177,7 @@ for permission in \
 do
   pm grant "\$PKG" "\$permission" >/dev/null 2>&1 || true
 done
-log -t "\$TAG" "matched AgentCall APK active: versionCode=\$code"
+log -t "\$TAG" "matched Arynox APK active: versionCode=\$code"
 EOF
 cat > "$stage/uninstall.sh" <<'EOF'
 #!/system/bin/sh

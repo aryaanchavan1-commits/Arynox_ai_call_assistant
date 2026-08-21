@@ -4,7 +4,7 @@ Status: implementation contract for Android and Electron
 
 ## Product character
 
-AgentCall is a professional cellular-agent communications product. Its interaction model may feel familiar to users of Telegram Desktop and WhatsApp Desktop, but its visual identity, components, colors, names, and assets are original. Android and Electron must feel like two native clients of the same product—not unrelated applications and not one platform compressed into the other.
+Arynox is a professional cellular-agent communications product. Its interaction model may feel familiar to users of Telegram Desktop and WhatsApp Desktop, but its visual identity, components, colors, names, and assets are original. Android and Electron must feel like two native clients of the same product—not unrelated applications and not one platform compressed into the other.
 
 ## Shared foundations
 

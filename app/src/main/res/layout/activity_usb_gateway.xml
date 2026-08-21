@@ -40,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="AgentCall Gateway"
+                    android:text="Arynox Gateway"
                     android:textColor="@color/hero_text_primary"
                     android:textSize="23sp" />
 

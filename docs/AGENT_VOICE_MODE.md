@@ -1,13 +1,13 @@
-# AgentCall voice-agent mode
+# Arynox voice-agent mode
 
-AgentCall carries live cellular audio and semantic turns. Hermes or OpenClaw is
+Arynox carries live cellular audio and semantic turns. Hermes or OpenClaw is
 the conversational agent. Keep one agent session alive for the entire call so
 its model context and MCP connection are not restarted between turns.
 
 Do not run a complete call with a one-shot agent command. A one-shot command may
 legitimately return after any model turn while the cellular call remains active,
 leaving the caller with silence. On Linux, use the persistent Hermes stdio
-gateway with AgentCall's supervisor:
+gateway with Arynox's supervisor:
 
 ```bash
 sudo -u "$USER" sg agentcall -c \
@@ -19,25 +19,25 @@ sudo -u "$USER" sg agentcall -c \
 ```
 
 The supervisor warms the user's normal Hermes configuration before dialing and
-retains that session for context. AgentCall, rather than the model, waits for
+retains that session for context. Arynox, rather than the model, waits for
 each completed caller turn. It sends the transcript directly into the existing
 Hermes session and speaks the completed answer through one continuous TTS
 request. The voice prompt asks for one to three concise, complete sentences so
 replies remain useful without restarting prosody between fragments or dropping
-the second thought. The opening that AgentCall already played is included in
+the second thought. The opening that Arynox already played is included in
 every turn prompt to prevent repeated greetings. One transient provider failure
 gets a natural clarification and retry instead of immediately ending the call.
 This removes a model tool-selection round while keeping consistent voice
 prosody and Hermes as the conversational brain. It does not create a profile or
 override the user's model. The managed voice subprocess loads only the
-AgentCall MCP surface and does not inject unrelated coding-workspace rules or
+Arynox MCP surface and does not inject unrelated coding-workspace rules or
 tools into telephone turns. The conversation still stays in one persistent
 Hermes session for the entire call.
 `HERMES_VOICE_MODEL` and `HERMES_VOICE_PROVIDER` are optional, explicit
-qualification overrides only. AgentCall continues to enforce consent, call
+qualification overrides only. Arynox continues to enforce consent, call
 correlation, interruption cancellation, and the five-minute limit.
 
-For AI-answered incoming calls, AgentCall treats the saved desktop text as the
+For AI-answered incoming calls, Arynox treats the saved desktop text as the
 owner's authoritative receptionist context. The opening identifies itself as
 the owner's AI call assistant when the owner's name is present, explains the
 saved availability, and asks an unknown caller for their name and reason. The
@@ -49,18 +49,18 @@ an availability, callback time, urgency or notification promise.
 
 ## Model and audio ownership
 
-- AgentCall does not hardcode a Hermes or OpenClaw model. An ordinary call uses
+- Arynox does not hardcode a Hermes or OpenClaw model. An ordinary call uses
   the model/provider already active in the host agent. Model selection remains
   the user's responsibility in that agent's normal configuration.
 - Do not route cellular PCM through the host agent's microphone-oriented voice
-  mode. AgentCall owns the continuous phone STT/TTS, 20 ms media framing, VAD,
+  mode. Arynox owns the continuous phone STT/TTS, 20 ms media framing, VAD,
   recording, and barge-in behavior.
-- AgentCall paces every synthesized frame on the 20 ms telephone clock. Provider
+- Arynox paces every synthesized frame on the 20 ms telephone clock. Provider
   streams can deliver audio much faster than real time; forwarding that burst
   directly would overflow the phone's bounded media queue and leave the caller
   hearing only the end of a greeting.
 - Hermes or OpenClaw owns reasoning, conversation context, and semantic call
-  control through MCP. This keeps AgentCall plug-and-play and avoids running two
+  control through MCP. This keeps Arynox plug-and-play and avoids running two
   competing STT/TTS and turn-detection pipelines.
 - Qualification may report that a selected model is incompatible or too slow
   for a natural call, but it must not silently change the user's model.
@@ -74,15 +74,15 @@ HERMES_VOICE_MODEL='configured-fast-model' \
 npm --prefix pc/pc-gateway run qualify:hermes-voice
 ```
 
-The supervisor performs a read-only AgentCall status tool call before dialing.
-If the preferred model cannot use AgentCall tools, it closes that session and
+The supervisor performs a read-only Arynox status tool call before dialing.
+If the preferred model cannot use Arynox tools, it closes that session and
 retries with the user's current/default Hermes model. Model names and providers
 are never hardcoded or silently persisted.
 
 ## Recommended agent instruction
 
 ```text
-Use only the local AgentCall MCP tools for this call.
+Use only the local Arynox MCP tools for this call.
 
 Hold a natural telephone conversation. Respond to the caller's actual intent,
 not to the mechanics of the call. Use contractions and ordinary spoken
@@ -98,7 +98,7 @@ caller asks. If a turn is genuinely unclear, ask a brief clarification instead
 of guessing.
 
 At the start of a call, greet the caller according to the gateway computer's
-local time (good morning, good afternoon, or good evening). If AgentCall exposes
+local time (good morning, good afternoon, or good evening). If Arynox exposes
 a saved `contactName`, use the first name naturally once in the greeting. Never
 guess a name.
 
@@ -110,12 +110,12 @@ context. Connect back naturally when relevant; do not recite the history.
 
 When an external Hermes/OpenClaw agent is driving MCP directly, prepare a
 complete context-specific opening and one to four likely complete replies before
-calling dial. AgentCall renders the opening before dialing, plays it once after
+calling dial. Arynox renders the opening before dialing, plays it once after
 the media route is stable, and warms the likely replies while the phone rings.
-When the next caller turn strongly matches a prepared reply, AgentCall plays
+When the next caller turn strongly matches a prepared reply, Arynox plays
 that exact warmed reply itself. If `wait_for_turn` reports
 `preparedReplySpoken: true`, do not call `speak` for that sequence; immediately
-wait again. Generate a live reply only when AgentCall has not already spoken.
+wait again. Generate a live reply only when Arynox has not already spoken.
 Pass `autoPreparedReply: false` only when the external agent must own selection.
 Keep the callId and latest sequence. Repeatedly call wait_for_turn with timeoutMs
 30000; contextual acknowledgement is enabled by default. If it times out, wait
@@ -129,7 +129,7 @@ If speech reports `speech provider unavailable`, the failed stream has already
 been aborted and the speech slot released. Re-read the latest turn and retry
 once with a fresh key; never replay a receipt marked `preparedReplySpoken`.
 
-For a managed outgoing call, AgentCall creates a dynamic plan from the recipient,
+For a managed outgoing call, Arynox creates a dynamic plan from the recipient,
 call context, caller configuration, local time, and language, then renders the
 recipient-verification opening before dialing. Identity
 disclosure, purpose, first question, likely question answers, busy/callback
@@ -155,7 +155,7 @@ text as only partially heard. Continue from the useful context, answer the
 caller's newest words directly, and do not restart or repeat the whole earlier
 answer.
 
-AgentCall may play one or two short contextual acknowledgements while the model
+Arynox may play one or two short contextual acknowledgements while the model
 is generating, such as "Sure, let me check that" followed by "I'm checking that
 now." Do not repeat either acknowledgement when the full response is ready.
 Continue immediately with the useful answer. Do not add another filler phrase.
@@ -169,25 +169,25 @@ the call after five minutes at most.
 
 Incoming-call answering is an explicit, local opt-in:
 
-1. Open **Settings** in AgentCall Desktop.
+1. Open **Settings** in Arynox AI Call Assistant.
 2. Turn on **AI answers incoming calls**.
 3. Enter the context and boundaries Hermes or OpenClaw should follow, then
    save. For example: “I am in a meeting until 4 PM. Tell callers I will call
    back, collect their name and reason, and do not discuss project details.”
-4. Keep AgentCall Desktop open. It starts Hermes with the user's current
+4. Keep Arynox AI Call Assistant open. It starts Hermes with the user's current
    provider/model, generates and renders the reusable opening and expected
    replies, keeps the session warm, and re-arms it after every call.
    OpenClaw can instead use the MCP receptionist loop below.
 
 The setting is off by default. The managed Hermes listener stops when the mode
-is turned off or AgentCall Desktop exits, and restarts after an unexpected
+is turned off or Arynox AI Call Assistant exits, and restarts after an unexpected
 agent exit. Enabling it does not bypass recording health,
 speech-provider health, call correlation, or the normal answer policy. If no
-agent listener is running, or if AgentCall cannot start the mandatory recording
+agent listener is running, or if Arynox cannot start the mandatory recording
 and speech session, the call is not silently answered.
 
 ```text
-Act as my telephone receptionist through the local AgentCall MCP server.
+Act as my telephone receptionist through the local Arynox MCP server.
 
 Repeatedly call wait_for_incoming_call with the latest afterSequence cursor and
 timeoutMs 30000. If it returns disabled, stop and tell me receptionist mode is
@@ -231,17 +231,17 @@ available.
   of repeatedly cancelling otherwise valid replies.
 - Punctuation-only duplicates and equivalent attention checks such as "hello",
   "hello, please speak", and "are you there" collapse into one turn. A warmed,
-  protected attention reply confirms that AgentCall is listening without
+  protected attention reply confirms that Arynox is listening without
   restarting the greeting, identity disclosure, or call purpose. Noisy
   affirmations remain eligible for recipient confirmation, while substantive
   repetitions, corrections, and unexpected questions continue through Hermes
   with the full prior topic.
 - Hermes `message.delta` output is observed for diagnostics while the model is
-  generating. AgentCall waits for the complete response and sends it through
+  generating. Arynox waits for the complete response and sends it through
   one continuous TTS request. Splitting a reply across independent TTS requests
   restarted prosody and could make adjacent replies sound as though they
   overlapped.
-- Every TTS chunk is guarded by a three-second no-audio deadline. AgentCall may
+- Every TTS chunk is guarded by a three-second no-audio deadline. Arynox may
   retry once before any audio reaches the phone; after partial playback it
   never retries automatically, preventing doubled or overlapping speech.
 - The first outgoing and incoming opening is one protected continuous segment.
@@ -249,17 +249,17 @@ available.
   while it plays are discarded at the opening turn boundary. Normal caller
   barge-in is enabled immediately after the opening completes and applies to
   every later response.
-- If the caller interrupts, AgentCall cancels the active continuous TTS. The
+- If the caller interrupts, Arynox cancels the active continuous TTS. The
   interrupted text and previous caller turn are included with the next prompt.
 - Slow questions receive a short, prewarmed context-matched acknowledgement
   after about 250 ms of model time. If Hermes is still thinking after about
-  2.2 seconds, AgentCall may add one brief follow-up. A quick complete answer
+  2.2 seconds, Arynox may add one brief follow-up. A quick complete answer
   cancels both timers, active acknowledgement playback finishes before the
   answer begins, and a six-second cross-turn cooldown prevents filler stacking.
 - Android writes a paced silent uplink frame between spoken segments. This
   keeps the telephony `AudioTrack` alive instead of letting it underrun and
   distort the beginning of the next greeting or reply.
-- After a call becomes active, AgentCall gives Android's telephony route a 250 ms
+- After a call becomes active, Arynox gives Android's telephony route a 250 ms
   safety margin for both incoming and outgoing calls before speaking the
   pre-rendered opening. The call is rechecked after the guard so a greeting is
   never sent to an ended call. Frame pacing, rather than extra startup silence,
@@ -293,7 +293,7 @@ available.
 - The same persistent Hermes session receives every caller turn, including the
   previous caller text and any interrupted agent text, so topic changes do not
   erase conversation context.
-- Transient agent failures remain audible: AgentCall gives up to three complete
+- Transient agent failures remain audible: Arynox gives up to three complete
   recovery prompts while keeping the call active. If the fourth consecutive
   response fails, it speaks a natural apology and farewell before hanging up;
   it never leaves repeated "Are you there?" turns in unexplained silence.
@@ -305,7 +305,7 @@ available.
   turns.
 
 For the lowest latency, select a fast model in the user's normal Hermes or
-OpenClaw configuration. AgentCall does not hardcode or silently replace that
+OpenClaw configuration. Arynox does not hardcode or silently replace that
 model. The managed Hermes path explicitly skips MCP tool selection during
 ordinary reply generation, while the generic OpenClaw path remains compatible
 with `wait_for_turn` and `speak`.
@@ -317,11 +317,11 @@ uses Twilio, Telnyx, or Plivo.
 [Vapi's OpenClaw skills](https://vapi.ai/blog/openclaw) provision a hosted
 assistant and telephone number. Those integrations validate the same realtime
 design principles used here: a persistent media stream, incremental model
-output, streamed TTS, and cancellation on interruption. AgentCall intentionally
+output, streamed TTS, and cancellation on interruption. Arynox intentionally
 uses a different transport: the user's rooted Android phone, SIM, and USB audio
 bridge. It therefore does not require a hosted phone number, Twilio media
 stream, or Vapi subscription. Hermes/OpenClaw still connects through the local
-AgentCall MCP server for semantic call control.
+Arynox MCP server for semantic call control.
 
 The implementation also follows the interruption and persistent-session model
 documented for
@@ -330,5 +330,5 @@ and uses ElevenLabs' recommended
 [Flash plus HTTP streaming path](https://elevenlabs.io/docs/api-reference/reducing-latency)
 once a complete self-contained sentence is available. ElevenLabs recommends
 its WebSocket input API when raw LLM tokens are sent incrementally, but also
-warns that committing before a natural phrase boundary harms prosody. AgentCall
+warns that committing before a natural phrase boundary harms prosody. Arynox
 therefore commits one complete sentence rather than forwarding partial words.

@@ -11,7 +11,7 @@ function providers({ stall = false } = {}) {
   let closeCalls = 0;
   const events = async function* () {
     if (stall) await new Promise(() => {});
-    yield { type: 'final', text: 'AgentCall speech test.' };
+    yield { type: 'final', text: 'Arynox speech test.' };
   };
   const stt = {
     open: async ({ language }, signal) => {
@@ -51,8 +51,8 @@ test('active provider speech test synthesizes, transcribes, and atomically write
 
   assert.deepEqual(await run(), {
     healthy: true,
-    phrase: 'AgentCall speech test.',
-    transcript: 'AgentCall speech test.',
+    phrase: 'Arynox speech test.',
+    transcript: 'Arynox speech test.',
     sttProvider: 'openai',
     ttsProvider: 'supertonic',
     sampleRate: 16_000,
@@ -60,7 +60,7 @@ test('active provider speech test synthesizes, transcribes, and atomically write
     playbackPath: artifactPath,
   });
   assert.deepEqual(f.calls, [
-    ['synthesize', 'AgentCall speech test.', 'F1', 'fr', false],
+    ['synthesize', 'Arynox speech test.', 'F1', 'fr', false],
     ['open', 'en', false],
     ['frame', 320, 0n], ['frame', 320, 20_000n], ['commit'],
   ]);

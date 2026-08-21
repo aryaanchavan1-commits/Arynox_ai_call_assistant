@@ -32,7 +32,7 @@ data class GatewayUiState(
         Connection.ERROR -> "USB gateway unavailable"
     }
 
-    val readyForAgentCalls: Boolean get() = desktopConnected
+    val readyForArynoxs: Boolean get() = desktopConnected
         && device.qualification == "qualified"
         && telecom == Health.HEALTHY
         && audioRx == Health.HEALTHY

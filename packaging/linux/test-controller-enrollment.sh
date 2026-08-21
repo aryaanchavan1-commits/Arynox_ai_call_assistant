@@ -25,7 +25,7 @@ if grep -E '^(ADB_VENDOR_KEYS|AGENTCALL_DEVICE_SERIAL|AGENTCALL_DEVICE_FINGERPRI
   printf 'manual pairing instructions must not be shipped\n' >&2
   exit 1
 fi
-grep -F 'No AgentCall credential is displayed, copied or typed.' "$install_doc" >/dev/null
+grep -F 'No Arynox credential is displayed, copied or typed.' "$install_doc" >/dev/null
 grep -F 'Package installation already enables and starts the offline-capable service.' "$install_doc" >/dev/null
 if grep -E 'agentcall-enroll-controller|Enroll the Linux controller|AGENTCALL_DEVICE_SERIAL=EXACT|AGENTCALL_DEVICE_FINGERPRINT=EXACT|ADB_VENDOR_KEYS=/etc/agentcall/adbkey|credential once' "$install_doc"; then
   printf 'installation guide still instructs legacy manual pairing\n' >&2

@@ -1,8 +1,8 @@
-# AgentCall architecture
+# Arynox architecture
 
 ## Product boundary
 
-AgentCall is a USB-only bridge between one Android cellular phone and one local
+Arynox is a USB-only bridge between one Android cellular phone and one local
 Windows or Linux host. The phone remains the cellular endpoint. The host owns
 policy, recording, realtime speech, the desktop UI, and the local agent
 integration.
@@ -69,7 +69,7 @@ tools and redacted text resources; it never exposes PCM, provider credentials,
 ADB payloads, private paths, contact rows, or raw phone numbers.
 
 Hermes or OpenClaw remains the reasoning engine. The managed voice supervisor
-keeps one AgentCall-only Hermes session through a call, carries the prior
+keeps one Arynox-only Hermes session through a call, carries the prior
 conversation and interrupted reply forward, and uses the user's selected model
 unless an operator explicitly configures a healthy override.
 
@@ -87,7 +87,7 @@ publishes it only after the complete size and SHA-256 match.
 2. The gateway validates E.164, approval, consent, policy, recording health,
    device identity, cooldown, and rate limits.
 3. Android places the Telecom call and returns a correlated call ID.
-4. AgentCall prepares a context-aware opening and a bounded set of high-value
+4. Arynox prepares a context-aware opening and a bounded set of high-value
    speech responses while the phone is dialing.
 5. When the call becomes active, paced audio starts after a 250 ms route safety
    margin.
@@ -105,7 +105,7 @@ publishes it only after the complete size and SHA-256 match.
    available.
 2. The gateway exposes only bounded caller memory and saved receptionist
    instructions to the agent.
-3. While the phone rings, AgentCall prepares the correct time/contact/context
+3. While the phone rings, Arynox prepares the correct time/contact/context
    opening.
 4. After the configured answer window, the same call is rechecked and answered
    only if AI answering is still enabled and all safety gates are healthy.
@@ -152,7 +152,7 @@ ordered transfer, hash verification, and an Android acceptance receipt.
 
 The product name, desktop UI, Android UI, repository, MCP server identity,
 Linux service account and paths, environment variables, privileged module ID,
-and MCP resources consistently use AgentCall identifiers. MCP clients use the
+and MCP resources consistently use Arynox identifiers. MCP clients use the
 `agentcall://` resource namespace.
 
 ## Source map

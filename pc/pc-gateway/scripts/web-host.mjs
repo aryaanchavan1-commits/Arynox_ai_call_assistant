@@ -317,7 +317,7 @@ async function serveRecordingArtifact(request, response, url, socketPath) {
     'content-type': artifact === 'conversation.wav' ? 'audio/wav' : 'video/x-matroska',
     'content-length': info.size,
     'cache-control': 'no-store',
-    'content-disposition': `inline; filename="AgentCall-${callId}.${artifact.endsWith('.wav') ? 'wav' : 'mkv'}"`,
+    'content-disposition': `inline; filename="Arynox-${callId}.${artifact.endsWith('.wav') ? 'wav' : 'mkv'}"`,
   });
   const stream = createReadStream(artifactPath);
   stream.on('error', () => response.destroy());

@@ -4,7 +4,7 @@
 
 **Support level: Full-duplex qualified for one bounded call on the exact tuple below. Not yet release-supported.**
 
-This is AgentCall's reference device port. New profiles must not regress its selector precedence, USB/G2 behavior, cleanup, or measured full-duplex path.
+This is Arynox's reference device port. New profiles must not regress its selector precedence, USB/G2 behavior, cleanup, or measured full-duplex path.
 
 ## Qualified tuple
 

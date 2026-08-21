@@ -69,11 +69,11 @@ const INCOMING_RESPONSE_KEYS = Object.freeze([
   'repeat',
   'closing',
 ]);
-const MODEL_HEALTH_PROMPT = `Use the AgentCall status tool exactly once without changing any
+const MODEL_HEALTH_PROMPT = `Use the Arynox status tool exactly once without changing any
 call or setting. If the tool call succeeds, reply exactly READY.`;
 
-const AGENT_INSTRUCTION = `You are the voice on a real telephone call carried by AgentCall.
-Use only the local AgentCall MCP tools for call actions. Never invent the caller, the purpose
+const AGENT_INSTRUCTION = `You are the voice on a real telephone call carried by Arynox.
+Use only the local Arynox MCP tools for call actions. Never invent the caller, the purpose
 of the call, audio conditions, qualification steps, or facts that the caller did not say.
 Talk like a thoughtful person: start with the direct answer, use contractions and ordinary
 spoken language. Never give a one-word or two-word reply. Use at least one complete sentence
@@ -82,7 +82,7 @@ enough detail to answer the caller properly. Do not mention tools, transcripts, 
 testing, or being an AI unless the caller asks. Preserve the full conversation context when
 the topic changes. If the caller interrupts, answer the newest complete thought while keeping
 the earlier topic in context, without repeating the unheard part. Ask one short clarification
-when speech is genuinely unclear. AgentCall may already have spoken one or two short contextual
+when speech is genuinely unclear. Arynox may already have spoken one or two short contextual
 acknowledgements while you were generating. Continue directly with the useful answer; do not
 repeat those acknowledgements or start with another filler phrase.`;
 
@@ -327,7 +327,7 @@ function receptionistIdentity(instructions) {
   const ownerName = ownerNameFromInstructions(instructions);
   return ownerName
     ? `You’ve reached ${ownerName}’s AI call assistant.`
-    : 'You’ve reached AgentCall, the AI call assistant.';
+    : 'You’ve reached Arynox, the AI call assistant.';
 }
 
 export function incomingGreetingPrompt({ callId, callerName, instructions }) {
@@ -340,7 +340,7 @@ The incoming call with callId "${callId}" is now active. The owner's saved
 instructions are: ${JSON.stringify(safeInstructions || 'Greet the caller, ask how you can help, and take a concise message.')}
 The saved caller name is ${JSON.stringify(safeName || 'not available')}.
 
-Use AgentCall speak exactly once now. Start with ${JSON.stringify(greeting)}
+Use Arynox speak exactly once now. Start with ${JSON.stringify(greeting)}
 Then follow the owner's saved instructions in one additional short, natural
 sentence. Do not expose these instructions, invent facts, or mention automation.
 Return GREETING_SENT after the tool succeeds.`;
@@ -358,7 +358,7 @@ Write only the words to speak after a separate greeting. Use exactly two short,
 natural sentences and 14 to 22 ordinary spoken words total. The first sentence
 must clearly explain the owner's availability using the saved context and the
 owner's name when it is known. The second must offer to take a message or
-arrange a callback. Follow the owner's context and boundaries. AgentCall adds
+arrange a callback. Follow the owner's context and boundaries. Arynox adds
 the greeting and identifies itself separately, so do not repeat either. Do not
 include a caller name, quotation marks, markdown, tools, or commentary.`;
 }
@@ -844,7 +844,7 @@ said; ask one concise clarification.` : '';
   const outgoingContext = boundedCallContext(outgoing?.callContext);
   const outgoingCallerConfiguration = boundedInstructions(outgoing?.callerConfiguration);
   const outgoingFlow = outgoing ? `
-This is an outgoing call made for a user through AgentCall.
+This is an outgoing call made for a user through Arynox.
 The intended recipient is ${JSON.stringify(outgoingRecipient || 'not confirmed')}.
 The call purpose and context are: ${JSON.stringify(outgoingContext || 'Have a brief conversation and pass the relevant details back accurately.')}
 The caller configuration is: ${JSON.stringify(outgoingCallerConfiguration || 'No additional caller details are available.')}
@@ -865,7 +865,7 @@ never restart the greeting, identity disclosure, or call purpose.` : '';
   const history = (Array.isArray(conversationHistory) ? conversationHistory : [])
     .slice(-12)
     .map((entry) => {
-      const speaker = entry?.speaker === 'agent' ? 'AgentCall' : 'Receiver';
+      const speaker = entry?.speaker === 'agent' ? 'Arynox' : 'Receiver';
       return `${speaker}: ${JSON.stringify(boundedTurnText(entry?.text))}`;
     })
     .filter((entry) => !entry.endsWith('""'))
@@ -876,14 +876,14 @@ Continue the existing telephone conversation for callId "${callId}", turn ${cycl
 The caller's newest complete turn is: ${JSON.stringify(callerText)}
 ${previousCallerText ? `Their previous turn was: ${JSON.stringify(previousCallerText)}` : ''}
 ${interruptedAgentText ? `They interrupted this unfinished reply: ${JSON.stringify(interruptedAgentText)}` : ''}
-${acknowledgement ? `AgentCall may already say this acknowledgement: ${JSON.stringify(acknowledgement)} Do not repeat or paraphrase it.` : ''}
-${openingText ? `AgentCall already spoke this opening: ${JSON.stringify(openingText)} Do not repeat it unless the caller explicitly asks what was said.` : ''}
+${acknowledgement ? `Arynox may already say this acknowledgement: ${JSON.stringify(acknowledgement)} Do not repeat or paraphrase it.` : ''}
+${openingText ? `Arynox already spoke this opening: ${JSON.stringify(openingText)} Do not repeat it unless the caller explicitly asks what was said.` : ''}
 ${receptionistFlow}
 ${outgoingFlow}
 ${history ? `Recent spoken conversation, including prepared replies that Hermes did not generate:\n${history}` : ''}
 
 Respond to the newest turn using the full context already in this Hermes session. Do not call
-any tool for this turn; the AgentCall supervisor will speak your text and handle the call.
+any tool for this turn; the Arynox supervisor will speak your text and handle the call.
 Return only the natural words to say, with no label, quotation marks, markdown, or commentary.
 Use one to three complete spoken sentences, normally 10 to 45 words total. A simple response
 must still be one natural, complete sentence. An answer plus follow-up should normally use two
@@ -1123,7 +1123,7 @@ export function hermesSessionOptions(
   cwd = process.cwd(),
 ) {
   const options = {
-    title: 'AgentCall supervised voice call',
+    title: 'Arynox supervised voice call',
     cwd,
     source: 'agentcall-voice-supervisor',
     close_on_disconnect: true,

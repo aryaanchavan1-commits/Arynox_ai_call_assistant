@@ -605,7 +605,7 @@ class UsbGatewayService : Service() {
 
     private fun createChannel() {
         getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, "AgentCall USB gateway", NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(CHANNEL_ID, "Arynox USB gateway", NotificationManager.IMPORTANCE_LOW)
         )
     }
 
@@ -615,7 +615,7 @@ class UsbGatewayService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         return Notification.Builder(this, CHANNEL_ID)
-            .setContentTitle("AgentCall")
+            .setContentTitle("Arynox")
             .setContentText(text)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(open)

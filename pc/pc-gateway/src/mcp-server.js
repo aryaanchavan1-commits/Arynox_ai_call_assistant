@@ -319,7 +319,7 @@ export const TOOLS = Object.freeze([
   },
   {
     name: 'wait_for_turn',
-    description: 'Wait efficiently for the next complete remote caller turn or call end. Prefer callId and afterSequence; common snake_case aliases are accepted and an omitted cursor resumes after the last delivered turn. AgentCall immediately plays an exact warmed prepared reply when a strong caller-intent match exists; when preparedReplySpoken is true, do not call speak for that turn and immediately wait again. Pass autoPreparedReply false to disable this behavior. Otherwise, brief contextual acknowledgements may play while response generation is pending; pass autoAcknowledge false to disable them.',
+    description: 'Wait efficiently for the next complete remote caller turn or call end. Prefer callId and afterSequence; common snake_case aliases are accepted and an omitted cursor resumes after the last delivered turn. Arynox immediately plays an exact warmed prepared reply when a strong caller-intent match exists; when preparedReplySpoken is true, do not call speak for that turn and immediately wait again. Pass autoPreparedReply false to disable this behavior. Otherwise, brief contextual acknowledgements may play while response generation is pending; pass autoAcknowledge false to disable them.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -340,7 +340,7 @@ export const TOOLS = Object.freeze([
   },
   {
     name: 'dial',
-    description: 'Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. Prefer destination, openingText, preparedReplies, approved, consent, and idempotencyKey; number, opening, responses, and snake_case idempotency_key are accepted for compatibility. AgentCall waits for the exact new call and live recording/media before playing the opening exactly once. An accepted dial has already scheduled that opening: never call speak for the opening. Supply one to four likely complete replies so AgentCall can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
+    description: 'Prepare the complete contextual opening in the selected voice, then place a manually approved, policy-gated, mandatory-recorded call. Prefer destination, openingText, preparedReplies, approved, consent, and idempotencyKey; number, opening, responses, and snake_case idempotency_key are accepted for compatibility. Arynox waits for the exact new call and live recording/media before playing the opening exactly once. An accepted dial has already scheduled that opening: never call speak for the opening. Supply one to four likely complete replies so Arynox can warm them while the phone rings. When a caller turn matches one, pass that exact prepared reply unchanged to speak so the cached audio is reused; generate a live reply only when none fits. After an accepted dial, do not finish the agent turn: immediately call wait_for_turn with the returned callId and afterSequence, then keep alternating wait_for_turn and speak until the call ends.',
     inputSchema: mutationSchema({
       destination: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },
       number: { type: 'string', pattern: '^\\+[1-9]\\d{5,14}$' },

@@ -1,4 +1,4 @@
-# Porting AgentCall to another Android device
+# Porting Arynox to another Android device
 
 This guide describes how to add a phone without weakening the fail-closed production boundary. A matching model name is not proof that cellular RX/TX audio works.
 

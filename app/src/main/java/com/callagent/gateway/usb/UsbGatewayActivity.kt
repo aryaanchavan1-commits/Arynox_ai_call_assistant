@@ -138,7 +138,7 @@ class UsbGatewayActivity : AppCompatActivity() {
         connection.text = state.connectionLabel
         detail.text = state.detail
         badge.text = when {
-            state.readyForAgentCalls -> "Ready for agent calls"
+            state.readyForArynoxs -> "Ready for agent calls"
             state.desktopConnected -> "Desktop connected"
             state.connection == GatewayUiState.Connection.LISTENING_USB -> "Waiting for desktop"
             else -> "USB gateway stopped"
@@ -196,6 +196,6 @@ class UsbGatewayActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val PROJECT_URL = "https://github.com/sidinsearch/AgentCall"
+        const val PROJECT_URL = "https://github.com/sidinsearch/Arynox"
     }
 }

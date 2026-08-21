@@ -87,11 +87,11 @@ audio is enabled.
 ## Quick start
 
 1. Download the desktop package and **one** Android installation artifact from
-   [AgentCall Releases](https://github.com/sidinsearch/AgentCall/releases).
+   [Upstream AgentCall releases](https://github.com/sidinsearch/AgentCall/releases).
 2. Verify the downloaded files against `SHA256SUMS`.
 3. Install either the standalone APK or the matched Magisk module—never both.
-4. Select AgentCall as Android's default Phone application.
-5. Install AgentCall Desktop, connect one authorized USB phone, and press
+4. Select Arynox as Android's default Phone application.
+5. Install Arynox AI Call Assistant, connect one authorized USB phone, and press
    **Connect desktop** in the Android app.
 6. Configure speech under **Speech**, then copy the OS-specific MCP command
    from **MCP** if Hermes or OpenClaw will operate calls.
@@ -105,9 +105,9 @@ audio is enabled.
 
 ```mermaid
 flowchart LR
-    Network["Cellular network"] <--> Phone["AgentCall Android<br/>Default dialer and telephony audio"]
-    Phone <-->|"Authenticated G2 control and PCM<br/>over USB + ADB forwarding"| Gateway["AgentCall gateway<br/>Policy, recording, STT/TTS, phone data"]
-    Gateway <--> Desktop["AgentCall Desktop<br/>Human controls and local playback"]
+    Network["Cellular network"] <--> Phone["Arynox Android<br/>Default dialer and telephony audio"]
+    Phone <-->|"Authenticated G2 control and PCM<br/>over USB + ADB forwarding"| Gateway["Arynox gateway<br/>Policy, recording, STT/TTS, phone data"]
+    Gateway <--> Desktop["Arynox AI Call Assistant<br/>Human controls and local playback"]
     Gateway <--> MCP["agentcall-mcp<br/>Local stdio only"]
     MCP <--> Agents["Hermes / OpenClaw"]
     Gateway <--> Speech["OpenAI / ElevenLabs<br/>Local Supertonic"]
@@ -137,51 +137,51 @@ interfaces. See the full [architecture](docs/ARCHITECTURE.md) and
 Screenshots use fictional sample data. Click any image to open its original,
 lossless PNG from the [`screenshots/`](screenshots/README.md) directory.
 
-### AgentCall Desktop
+### Arynox AI Call Assistant
 
 <table>
   <tr>
-    <td width="50%" align="center"><a href="screenshots/desktop/agentcall-readme-desktop-calls.png"><img src="screenshots/desktop/agentcall-readme-desktop-calls.png" alt="AgentCall Desktop call history with fictional sample data"></a><br><sub><strong>Calls</strong> — synchronized history and one-click calling</sub></td>
-    <td width="50%" align="center"><a href="screenshots/desktop/agentcall-readme-desktop-contacts.png"><img src="screenshots/desktop/agentcall-readme-desktop-contacts.png" alt="AgentCall Desktop contacts with fictional sample data"></a><br><sub><strong>Contacts</strong> — searchable local phone mirror</sub></td>
+    <td width="50%" align="center"><a href="screenshots/desktop/agentcall-readme-desktop-calls.png"><img src="screenshots/desktop/agentcall-readme-desktop-calls.png" alt="Arynox AI Call Assistant call history with fictional sample data"></a><br><sub><strong>Calls</strong> — synchronized history and one-click calling</sub></td>
+    <td width="50%" align="center"><a href="screenshots/desktop/agentcall-readme-desktop-contacts.png"><img src="screenshots/desktop/agentcall-readme-desktop-contacts.png" alt="Arynox AI Call Assistant contacts with fictional sample data"></a><br><sub><strong>Contacts</strong> — searchable local phone mirror</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-live.png"><img src="screenshots/desktop/agentcall-readme-desktop-live.png" alt="AgentCall Desktop Live Call workspace"></a><br><sub><strong>Live Call</strong> — place and control cellular calls</sub></td>
-    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-android.png"><img src="screenshots/desktop/agentcall-readme-desktop-android.png" alt="AgentCall Desktop Android connection health"></a><br><sub><strong>Android connection</strong> — authenticated USB and recording health</sub></td>
+    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-live.png"><img src="screenshots/desktop/agentcall-readme-desktop-live.png" alt="Arynox AI Call Assistant Live Call workspace"></a><br><sub><strong>Live Call</strong> — place and control cellular calls</sub></td>
+    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-android.png"><img src="screenshots/desktop/agentcall-readme-desktop-android.png" alt="Arynox AI Call Assistant Android connection health"></a><br><sub><strong>Android connection</strong> — authenticated USB and recording health</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-speech.png"><img src="screenshots/desktop/agentcall-readme-desktop-speech.png" alt="AgentCall Desktop speech provider configuration"></a><br><sub><strong>Speech</strong> — provider, model, language, and voice</sub></td>
-    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-mcp.png"><img src="screenshots/desktop/agentcall-readme-desktop-mcp.png" alt="AgentCall Desktop Hermes and OpenClaw MCP integration"></a><br><sub><strong>Agent integrations</strong> — local Hermes and OpenClaw setup</sub></td>
+    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-speech.png"><img src="screenshots/desktop/agentcall-readme-desktop-speech.png" alt="Arynox AI Call Assistant speech provider configuration"></a><br><sub><strong>Speech</strong> — provider, model, language, and voice</sub></td>
+    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-mcp.png"><img src="screenshots/desktop/agentcall-readme-desktop-mcp.png" alt="Arynox AI Call Assistant Hermes and OpenClaw MCP integration"></a><br><sub><strong>Agent integrations</strong> — local Hermes and OpenClaw setup</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-recordings.png"><img src="screenshots/desktop/agentcall-readme-desktop-recordings.png" alt="AgentCall Desktop recording player and synchronization"></a><br><sub><strong>Recordings</strong> — play, export, and synchronize finalized calls</sub></td>
-    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-settings.png"><img src="screenshots/desktop/agentcall-readme-desktop-settings.png" alt="AgentCall Desktop receptionist and synchronization settings"></a><br><sub><strong>Settings</strong> — AI receptionist context and phone synchronization</sub></td>
+    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-recordings.png"><img src="screenshots/desktop/agentcall-readme-desktop-recordings.png" alt="Arynox AI Call Assistant recording player and synchronization"></a><br><sub><strong>Recordings</strong> — play, export, and synchronize finalized calls</sub></td>
+    <td align="center"><a href="screenshots/desktop/agentcall-readme-desktop-settings.png"><img src="screenshots/desktop/agentcall-readme-desktop-settings.png" alt="Arynox AI Call Assistant receptionist and synchronization settings"></a><br><sub><strong>Settings</strong> — AI receptionist context and phone synchronization</sub></td>
   </tr>
   <tr>
-    <td colspan="2" align="center"><a href="screenshots/desktop/agentcall-readme-desktop-policy.png"><img src="screenshots/desktop/agentcall-readme-desktop-policy.png" width="50%" alt="AgentCall Desktop call and privacy policy"></a><br><sub><strong>Policy</strong> — call, recording, privacy, and provider protections</sub></td>
+    <td colspan="2" align="center"><a href="screenshots/desktop/agentcall-readme-desktop-policy.png"><img src="screenshots/desktop/agentcall-readme-desktop-policy.png" width="50%" alt="Arynox AI Call Assistant call and privacy policy"></a><br><sub><strong>Policy</strong> — call, recording, privacy, and provider protections</sub></td>
   </tr>
 </table>
 
-### AgentCall for Android
+### Arynox for Android
 
 <table>
   <tr>
-    <td width="33%" align="center"><a href="screenshots/android/agentcall-readme-android-recents.png"><img src="screenshots/android/agentcall-readme-android-recents.png" alt="AgentCall Android recent calls with fictional sample data"></a><br><sub><strong>Recents</strong> — cellular call history</sub></td>
-    <td width="33%" align="center"><a href="screenshots/android/agentcall-readme-android-contacts.png"><img src="screenshots/android/agentcall-readme-android-contacts.png" alt="AgentCall Android contacts with fictional sample data"></a><br><sub><strong>Contacts</strong> — saved names and one-tap calls</sub></td>
-    <td width="33%" align="center"><a href="screenshots/android/agentcall-readme-android-keypad.png"><img src="screenshots/android/agentcall-readme-android-keypad.png" alt="AgentCall Android rounded phone keypad"></a><br><sub><strong>Keypad</strong> — native cellular dialing</sub></td>
+    <td width="33%" align="center"><a href="screenshots/android/agentcall-readme-android-recents.png"><img src="screenshots/android/agentcall-readme-android-recents.png" alt="Arynox Android recent calls with fictional sample data"></a><br><sub><strong>Recents</strong> — cellular call history</sub></td>
+    <td width="33%" align="center"><a href="screenshots/android/agentcall-readme-android-contacts.png"><img src="screenshots/android/agentcall-readme-android-contacts.png" alt="Arynox Android contacts with fictional sample data"></a><br><sub><strong>Contacts</strong> — saved names and one-tap calls</sub></td>
+    <td width="33%" align="center"><a href="screenshots/android/agentcall-readme-android-keypad.png"><img src="screenshots/android/agentcall-readme-android-keypad.png" alt="Arynox Android rounded phone keypad"></a><br><sub><strong>Keypad</strong> — native cellular dialing</sub></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-gateway.png"><img src="screenshots/android/agentcall-readme-android-gateway.png" width="66%" alt="AgentCall Android desktop pairing and system readiness"></a><br><sub><strong>Gateway</strong> — pairing and device readiness</sub></td>
-    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-recordings.png"><img src="screenshots/android/agentcall-readme-android-recordings.png" width="66%" alt="AgentCall Android in-app recording player"></a><br><sub><strong>Recordings</strong> — playback, save, and deletion</sub></td>
+    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-gateway.png"><img src="screenshots/android/agentcall-readme-android-gateway.png" width="66%" alt="Arynox Android desktop pairing and system readiness"></a><br><sub><strong>Gateway</strong> — pairing and device readiness</sub></td>
+    <td width="50%" align="center"><a href="screenshots/android/agentcall-readme-android-recordings.png"><img src="screenshots/android/agentcall-readme-android-recordings.png" width="66%" alt="Arynox Android in-app recording player"></a><br><sub><strong>Recordings</strong> — playback, save, and deletion</sub></td>
   </tr>
 </table>
 
 ## Release downloads
 
 Download the current files from
-[AgentCall v1.0.1](https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.1).
+[upstream AgentCall v1.0.1](https://github.com/sidinsearch/AgentCall/releases/tag/v1.0.1).
 
 | Asset | Use |
 |---|---|
@@ -214,7 +214,7 @@ Requirements:
 
 - a dedicated phone with an active SIM;
 - USB debugging enabled;
-- AgentCall selected as the default Phone application;
+- Arynox selected as the default Phone application;
 - Magisk for the privileged full-duplex path.
 
 Choose exactly one Android installation method.
@@ -224,7 +224,7 @@ Choose exactly one Android installation method.
 1. Copy `AgentCall-privileged-1.0.1-333-magisk.zip` to the phone.
 2. Review and install it from Magisk.
 3. Require a successful installer result and reboot.
-4. Open AgentCall and select it as the default Phone application.
+4. Open Arynox and select it as the default Phone application.
 5. Do not install the standalone APK beside the module.
 
 #### Ordinary APK
@@ -244,15 +244,15 @@ adb shell cmd role get-role-holders android.app.role.DIALER
 ```
 
 The expected package is `com.callagent.gateway`, version `1.0.1 (333)`, and
-the dialer role must name AgentCall.
+the dialer role must name Arynox.
 
-### 2. Install AgentCall Desktop
+### 2. Install Arynox AI Call Assistant
 
 #### Windows
 
 1. Run `agentcall-desktop-1.0.1-x64-setup.exe`.
 2. Choose the installation directory and finish setup.
-3. Open **AgentCall Desktop** from Start or its desktop shortcut.
+3. Open **Arynox AI Call Assistant** from Start or its desktop shortcut.
 
 The Windows package supervises its local gateway and includes the required ADB
 and FFmpeg tools. Provider keys and recordings remain in the current Windows
@@ -287,7 +287,7 @@ not the product name shown to users.
 
 1. Connect exactly one phone over physical USB.
 2. Review and approve Android's USB-debugging prompt for this computer.
-3. Open AgentCall on Android and press **Connect desktop**.
+3. Open Arynox on Android and press **Connect desktop**.
 4. Wait for both applications to show the phone as authenticated and ready.
 5. Confirm recording health before placing or answering a call.
 
@@ -296,7 +296,7 @@ complete [installation guide](docs/INSTALL.md).
 
 ## Speech configuration
 
-Open **AgentCall Desktop → Speech**.
+Open **Arynox AI Call Assistant → Speech**.
 
 1. Select an STT provider and model.
 2. Select a TTS provider, model, language, and voice.
@@ -367,10 +367,10 @@ rotates; any well-formed model id is accepted.
 
 ## Hermes / OpenClaw MCP
 
-AgentCall exposes MCP `2024-11-05` over local stdio. It does not expose a
+Arynox exposes MCP `2024-11-05` over local stdio. It does not expose a
 network MCP endpoint.
 
-### Add AgentCall to Hermes or OpenClaw
+### Add Arynox to Hermes or OpenClaw
 
 On Linux, add the local MCP launcher to Hermes:
 
@@ -381,8 +381,8 @@ hermes mcp list
 ```
 
 OpenClaw uses the same launcher. On Windows, open
-**AgentCall Desktop → MCP** and copy the displayed `agentcall-mcp.cmd` path
-into Hermes or OpenClaw. AgentCall MCP is local stdio—do not add a network URL.
+**Arynox AI Call Assistant → MCP** and copy the displayed `agentcall-mcp.cmd` path
+into Hermes or OpenClaw. Arynox MCP is local stdio—do not add a network URL.
 
 The semantic tools are:
 
@@ -390,7 +390,7 @@ The semantic tools are:
 `dial` · `prepare_speech` · `answer` · `reject` · `hangup` · `send_dtmf` ·
 `speak`
 
-AgentCall prepares openings and likely replies before a call, then keeps live
+Arynox prepares openings and likely replies before a call, then keeps live
 conversation context, handles interruptions, and closes naturally. Incoming
 AI pickup reuses time-aware prepared speech; changing its instructions or TTS
 voice refreshes that audio automatically.
@@ -450,7 +450,7 @@ Clone and run the canonical verifier on Linux:
 
 ```bash
 git clone https://github.com/sidinsearch/AgentCall.git
-cd AgentCall
+cd Arynox
 ./verify.sh
 ```
 

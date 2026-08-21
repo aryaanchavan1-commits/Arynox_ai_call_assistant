@@ -39,11 +39,11 @@ function flattenMenu(items) {
 }
 
 test('packaged Electron application entrypoint starts even when argv has no source path', () => {
-  const modulePath = '/opt/AgentCall Desktop/resources/app.asar/electron/main.js';
+  const modulePath = '/opt/Arynox AI Call Assistant/resources/app.asar/electron/main.js';
   const electronRuntime = { versions: { electron: '37.2.6' } };
   const nodeRuntime = { versions: { node: process.versions.node } };
 
-  assert.equal(isApplicationEntrypoint(['/opt/AgentCall Desktop/agentcall-desktop'], modulePath, electronRuntime), true);
+  assert.equal(isApplicationEntrypoint(['/opt/Arynox AI Call Assistant/agentcall-desktop'], modulePath, electronRuntime), true);
   assert.equal(isApplicationEntrypoint(['/usr/bin/node', modulePath], modulePath, nodeRuntime), true);
   assert.equal(isApplicationEntrypoint(['/usr/bin/node', '/tmp/importer.mjs'], modulePath, nodeRuntime), false);
 });

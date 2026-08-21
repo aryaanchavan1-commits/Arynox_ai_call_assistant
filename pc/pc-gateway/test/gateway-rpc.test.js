@@ -54,7 +54,7 @@ function fakeGateway() {
   gateway.testProviders = async () => {
     gateway.calls.push(['testProviders', {}]);
     return {
-      healthy: true, phrase: 'AgentCall speech test.', transcript: 'AgentCall speech test.',
+      healthy: true, phrase: 'Arynox speech test.', transcript: 'Arynox speech test.',
       sttProvider: 'openai', ttsProvider: 'supertonic', sampleRate: 16_000, samples: 640,
       playbackPath: '/run/agentcall/provider-test.wav',
     };
@@ -203,7 +203,7 @@ test('RPC exposes redacted provider status, health, and write-only configuration
     kind: 'stt', provider: 'openai', healthy: true, scope: 'credential',
   });
   assert.deepEqual(await client.testProviders(), {
-    healthy: true, phrase: 'AgentCall speech test.', transcript: 'AgentCall speech test.',
+    healthy: true, phrase: 'Arynox speech test.', transcript: 'Arynox speech test.',
     sttProvider: 'openai', ttsProvider: 'supertonic', sampleRate: 16_000, samples: 640,
     playbackPath: '/run/agentcall/provider-test.wav',
   });

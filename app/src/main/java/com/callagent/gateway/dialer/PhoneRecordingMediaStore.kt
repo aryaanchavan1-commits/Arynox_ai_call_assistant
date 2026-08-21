@@ -109,10 +109,10 @@ class PhoneRecordingMediaStore(private val context: Context) {
         }
 
     companion object {
-        const val RELATIVE_PATH = "Recordings/AgentCall/"
-        const val PREFIX = "AgentCall-"
+        const val RELATIVE_PATH = "Recordings/Arynox/"
+        const val PREFIX = "Arynox-"
         const val MIME_TYPE = "audio/wav"
-        private val SAFE_NAME = Regex("^AgentCall-[A-Za-z0-9][A-Za-z0-9._-]{0,127}\\.wav$")
+        private val SAFE_NAME = Regex("^Arynox-[A-Za-z0-9][A-Za-z0-9._-]{0,127}\\.wav$")
     }
 }
 

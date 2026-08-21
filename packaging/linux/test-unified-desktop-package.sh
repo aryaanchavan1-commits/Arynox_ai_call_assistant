@@ -54,7 +54,7 @@ if grep -rIl "$cr" \
   exit 1
 fi
 
-test -x "$tmp/root/opt/AgentCall Desktop/agentcall-desktop"
+test -x "$tmp/root/opt/Arynox AI Call Assistant/agentcall-desktop"
 grep -F "update-alternatives --install '/usr/bin/agentcall-desktop'" "$tmp/control/postinst" >/dev/null
 test -L "$tmp/root/usr/bin/agentcall-gatewayd"
 test -L "$tmp/root/usr/bin/agentcall-mcp"
@@ -68,10 +68,10 @@ for command in mcp health logs recorder-health backup-state restore-state enroll
 done
 test -f "$tmp/root/usr/lib/agentcall/pc-gateway/src/gatewayd.js"
 test -f "$tmp/root/usr/lib/agentcall/pc-gateway/src/provider-speech-test.js"
-grep -F "action:provider-test" "$tmp/root/opt/AgentCall Desktop/resources/app.asar.unpacked/electron/preload.cjs" >/dev/null 2>&1 || {
+grep -F "action:provider-test" "$tmp/root/opt/Arynox AI Call Assistant/resources/app.asar.unpacked/electron/preload.cjs" >/dev/null 2>&1 || {
   # Electron normally packs preload into app.asar; inspect it without extracting files.
   node - "$root/pc/pc-gateway/ui/node_modules/@electron/asar" \
-    "$tmp/root/opt/AgentCall Desktop/resources/app.asar" "$tmp/preload.cjs" <<'NODE'
+    "$tmp/root/opt/Arynox AI Call Assistant/resources/app.asar" "$tmp/preload.cjs" <<'NODE'
 const [modulePath, archivePath, outputPath] = process.argv.slice(2);
 const { writeFileSync } = require('node:fs');
 const { extractFile } = require(modulePath);

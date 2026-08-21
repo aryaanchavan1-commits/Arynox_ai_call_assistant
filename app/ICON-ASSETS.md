@@ -1,4 +1,4 @@
-# AgentCall application icon
+# Arynox application icon
 
 The Android and desktop applications share the teal call artwork in
 `artwork/agentcall-app-icon.png`. The checked-in source is the square master

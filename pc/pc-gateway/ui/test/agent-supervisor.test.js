@@ -12,16 +12,16 @@ test('supervisor configuration launches the packaged receptionist with the local
   const configuration = agentSupervisorConfiguration({
     platform: 'win32',
     isPackaged: true,
-    resourcesPath: 'C:\\AgentCall\\resources',
-    appPath: 'C:\\AgentCall\\resources\\app.asar',
-    execPath: 'C:\\AgentCall\\AgentCall Desktop.exe',
+    resourcesPath: 'C:\\Arynox\\resources',
+    appPath: 'C:\\Arynox\\resources\\app.asar',
+    execPath: 'C:\\Arynox\\Arynox AI Call Assistant.exe',
     socketPath: '\\\\.\\pipe\\agentcall-gatewayd-desktop',
     environment: { SAFE_SETTING: 'kept' },
   });
-  assert.equal(configuration.command, 'C:\\AgentCall\\AgentCall Desktop.exe');
+  assert.equal(configuration.command, 'C:\\Arynox\\Arynox AI Call Assistant.exe');
   assert.equal(
     configuration.args[0],
-    path.join('C:\\AgentCall\\resources', 'gateway', 'scripts', 'hermes-voice-supervisor.js'),
+    path.join('C:\\Arynox\\resources', 'gateway', 'scripts', 'hermes-voice-supervisor.js'),
   );
   assert.equal(configuration.environment.ELECTRON_RUN_AS_NODE, '1');
   assert.equal(configuration.environment.AGENTCALL_RECEPTIONIST_MODE, 'yes');

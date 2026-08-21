@@ -40,9 +40,9 @@
         android:usesCleartextTraffic="false"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="AgentCall"
+        android:label="Arynox"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AgentCall"
+        android:theme="@style/Theme.Arynox"
         tools:targetApi="35">
 
         <activity
@@ -56,7 +56,7 @@
         <activity
             android:name=".dialer.DialerActivity"
             android:exported="true"
-            android:label="AgentCall"
+            android:label="Arynox"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

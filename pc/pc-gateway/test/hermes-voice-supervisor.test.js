@@ -252,7 +252,7 @@ test('supervisor sends one continuous response stream after Hermes completes', a
   assert.deepEqual(result, { reason: 'call_ended', cycles: 1 });
   assert.equal(prompts.length, 1);
   assert.match(prompts[0].prompt, /Does the earlier idea still work/);
-  assert.match(prompts[0].prompt, /AgentCall may already say this acknowledgement/);
+  assert.match(prompts[0].prompt, /Arynox may already say this acknowledgement/);
   assert.match(prompts[0].prompt, /Do not call\s+any tool/);
   assert.deepEqual(spoken, [
     'That is a useful question, and the short answer is yes. The earlier point still matters, so I would keep both ideas together.',
@@ -548,7 +548,7 @@ test('supervisor carries the spoken opening into every Hermes turn without repea
     deadline: Date.now() + 30_000,
   });
   assert.deepEqual(result, { reason: 'call_ended', cycles: 1 });
-  assert.match(prompts[0], /AgentCall already spoke this opening/);
+  assert.match(prompts[0], /Arynox already spoke this opening/);
   assert.match(prompts[0], /Good evening, Aarav/);
   assert.match(prompts[0], /Do not repeat it unless the caller explicitly asks/);
   assert.match(prompts[0], /incoming receptionist call/);
@@ -723,7 +723,7 @@ test('incoming answer window rechecks the same ringing call before pickup', asyn
 
 test('Hermes model selection inherits the user default unless explicitly overridden', () => {
   assert.deepEqual(hermesSessionOptions({}, '/workspace'), {
-    title: 'AgentCall supervised voice call',
+    title: 'Arynox supervised voice call',
     cwd: '/workspace',
     source: 'agentcall-voice-supervisor',
     close_on_disconnect: true,
@@ -732,7 +732,7 @@ test('Hermes model selection inherits the user default unless explicitly overrid
     HERMES_VOICE_MODEL: 'chosen-model',
     HERMES_VOICE_PROVIDER: 'chosen-provider',
   }, '/workspace'), {
-    title: 'AgentCall supervised voice call',
+    title: 'Arynox supervised voice call',
     cwd: '/workspace',
     source: 'agentcall-voice-supervisor',
     close_on_disconnect: true,
@@ -741,7 +741,7 @@ test('Hermes model selection inherits the user default unless explicitly overrid
   });
 });
 
-test('managed Hermes voice runtime loads only AgentCall tools without changing model choice', () => {
+test('managed Hermes voice runtime loads only Arynox tools without changing model choice', () => {
   assert.deepEqual(
     hermesGatewayEnvironment({
       HERMES_VOICE_MODEL: 'user-selected-model',
@@ -912,7 +912,7 @@ test('outgoing prepared replies use semantic intent and defer corrections to Her
 test('outgoing prepared state survives hello and noisy yes without restarting the introduction', () => {
   const plan = fallbackOutgoingPlan({
     recipientName: 'Sahil',
-    callContext: 'Give a brief AgentCall demonstration.',
+    callContext: 'Give a brief Arynox demonstration.',
     callerConfiguration: 'The owner name is Siddharth.',
   });
   const responder = createPreparedOutgoingResponder(plan, { recipientName: 'Sahil' });
@@ -991,7 +991,7 @@ test('supervisor protects one attention repair and suppresses its immediate dupl
   let latestSequence = 2;
   const plan = fallbackOutgoingPlan({
     recipientName: 'Sahil',
-    callContext: 'Give a brief AgentCall demonstration.',
+    callContext: 'Give a brief Arynox demonstration.',
   });
   const result = await superviseHermesTurns({
     hermes: {
@@ -1191,7 +1191,7 @@ test('receptionist opening is prepared before pickup and remains short and human
   });
   assert.equal(
     opening,
-    'Good evening, Siddharth. You’ve reached AgentCall, the AI call assistant. They are in a meeting. May I take a message?',
+    'Good evening, Siddharth. You’ve reached Arynox, the AI call assistant. They are in a meeting. May I take a message?',
   );
   assert.match(opening, /May I take a message/);
   assert.doesNotMatch(opening, /How are you/);

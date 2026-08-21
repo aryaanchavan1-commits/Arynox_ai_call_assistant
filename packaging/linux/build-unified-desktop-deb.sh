@@ -66,13 +66,13 @@ Architecture: amd64
 Section: comm
 Priority: optional
 Maintainer: sidinsearch <siddhushinde788@gmail.com>
-Homepage: https://github.com/sidinsearch/AgentCall
+Homepage: https://github.com/sidinsearch/Arynox
 Depends: libgtk-3-0, libnss3, libasound2, nodejs (>= 20), python3, android-tools-adb, ffmpeg
 Recommends: libappindicator3-1
 Provides: agentcall-gatewayd (= $version)
 Conflicts: agentcall-gatewayd
 Replaces: agentcall-gatewayd
-Description: Complete USB-only AgentCall desktop cellular gateway
+Description: Complete USB-only Arynox desktop cellular gateway
  One installable desktop application containing the Electron operator UI,
  supervised gateway daemon, stdio MCP launcher, systemd unit, enrollment,
  health, backup and recovery helpers. The UI remains unprivileged and talks

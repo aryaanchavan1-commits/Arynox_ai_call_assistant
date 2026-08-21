@@ -1,10 +1,10 @@
-# Contributing to AgentCall
+# Contributing to Arynox
 
 Thank you for helping make USB-only cellular agent gateways work on more Android devices.
 
 ## License and contribution terms
 
-AgentCall is licensed under the [GNU Affero General Public License v3.0 only](LICENSE). By submitting a pull request or other contribution for inclusion, you agree that it is provided under `AGPL-3.0-only`. Do not submit code, firmware, recordings, mixer tables, or vendor files that you do not have permission to share.
+Arynox is licensed under the [GNU Affero General Public License v3.0 only](LICENSE). By submitting a pull request or other contribution for inclusion, you agree that it is provided under `AGPL-3.0-only`. Do not submit code, firmware, recordings, mixer tables, or vendor files that you do not have permission to share.
 
 No separate contributor license agreement is currently required. Keep authorship in Git history; do not add personal copyright headers to every source file.
 

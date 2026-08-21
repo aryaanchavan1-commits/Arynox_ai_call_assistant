@@ -1,4 +1,4 @@
-# AgentCall screenshots
+# Arynox screenshots
 
 This directory contains the original lossless PNG files used by the main
 project README.

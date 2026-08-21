@@ -30,10 +30,10 @@ class GatewayUiStateTest {
         state = state.reduce(GatewayUiEvent.DeviceQualified("POCO M2 Pro", "gram", "qualified"))
         state = state.reduce(GatewayUiEvent.TelecomReady)
         state = state.reduce(GatewayUiEvent.AudioReady(rx = true, tx = true))
-        assertFalse(state.readyForAgentCalls)
+        assertFalse(state.readyForArynoxs)
         assertEquals(GatewayUiState.Health.FAIL_CLOSED, state.recording)
         state = state.reduce(GatewayUiEvent.RecordingHealthy)
-        assertTrue(state.readyForAgentCalls)
+        assertTrue(state.readyForArynoxs)
         assertEquals("Desktop connected via USB", state.connectionLabel)
     }
 

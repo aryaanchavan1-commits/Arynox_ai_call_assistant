@@ -2,7 +2,7 @@ import { chmod, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 
-const PHRASE = 'AgentCall speech test.';
+const PHRASE = 'Arynox speech test.';
 const OUTPUT_RATE = 16_000;
 const FRAME_SAMPLES = 320;
 const MAX_SAMPLES = OUTPUT_RATE * 10;

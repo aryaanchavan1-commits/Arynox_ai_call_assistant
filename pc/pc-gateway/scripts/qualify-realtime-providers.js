@@ -7,7 +7,7 @@ import { ElevenLabsRealtimeSttProvider } from '../src/elevenlabs-realtime-stt-pr
 import { ElevenLabsTtsProvider } from '../src/elevenlabs-tts-provider.js';
 import { OpenAiRealtimeSttProvider } from '../src/openai-realtime-stt-provider.js';
 
-const phrase = 'AgentCall provider qualification.';
+const phrase = 'Arynox provider qualification.';
 const outputDirectory = resolve(process.argv[2] || './qualification-output');
 const elevenKey = process.env.ELEVENLABS_API_KEY || '';
 const openAiKey = process.env.OPENAI_API_KEY || '';

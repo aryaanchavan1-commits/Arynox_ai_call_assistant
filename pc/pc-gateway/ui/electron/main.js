@@ -307,8 +307,8 @@ export async function startElectron() {
       incomingNotification = new Notification({
         title: identity.name ? `Incoming call · ${identity.name}` : 'Incoming call',
         body: identity.number
-          ? `${identity.number}\nOpen AgentCall Desktop to answer or reject.`
-          : 'Open AgentCall Desktop to answer or reject.',
+          ? `${identity.number}\nOpen Arynox AI Call Assistant to answer or reject.`
+          : 'Open Arynox AI Call Assistant to answer or reject.',
         silent: false,
         timeoutType: 'never',
         urgency: 'critical',

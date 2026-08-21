@@ -362,7 +362,7 @@ test('provider test IPC opens only the daemon artifact and returns no local path
   const audit = [];
   const gateway = {
     testProviders: async () => ({
-      healthy: true, phrase: 'AgentCall speech test.', transcript: 'AgentCall speech test.',
+      healthy: true, phrase: 'Arynox speech test.', transcript: 'Arynox speech test.',
       sttProvider: 'openai', ttsProvider: 'supertonic', sampleRate: 16_000, samples: 640,
       playbackPath: '/run/agentcall/provider-test.wav',
     }),
@@ -376,7 +376,7 @@ test('provider test IPC opens only the daemon artifact and returns no local path
 
   const result = await handlers['action:provider-test'](null, {});
   assert.deepEqual(result, {
-    healthy: true, phrase: 'AgentCall speech test.', transcript: 'AgentCall speech test.',
+    healthy: true, phrase: 'Arynox speech test.', transcript: 'Arynox speech test.',
     sttProvider: 'openai', ttsProvider: 'supertonic', sampleRate: 16_000, samples: 640,
     playbackOpened: true,
   });
@@ -398,8 +398,8 @@ test('provider test IPC validates bounded metadata before opening playback', asy
     gateway: {
       testProviders: async () => ({
         healthy: true,
-        phrase: 'AgentCall speech test.',
-        transcript: 'AgentCall speech test.',
+        phrase: 'Arynox speech test.',
+        transcript: 'Arynox speech test.',
         sttProvider: 'openai',
         ttsProvider: 'supertonic',
         sampleRate: 1,
@@ -470,7 +470,7 @@ test('live recording IPC lists, plays, saves, syncs, and deletes without exposin
   assert.equal(JSON.stringify(playback).includes('/private/'), false);
   assert.deepEqual(save, { accepted: true, canceled: false, action: 'save', callId: 'call-1' });
   assert.deepEqual(sync, { state: 'stored', callId: 'call-1', bytes: 42 });
-  assert.deepEqual(saved, [['/run/agentcall/recording-exports/call-1/conversation.wav', 'AgentCall-call-1.wav']]);
+  assert.deepEqual(saved, [['/run/agentcall/recording-exports/call-1/conversation.wav', 'Arynox-call-1.wav']]);
   assert.deepEqual(deleted, { deleted: true, callId: 'call-1' });
   assert.deepEqual(calls, [
     ['list', { limit: 100 }],

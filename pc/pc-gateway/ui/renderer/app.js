@@ -426,22 +426,22 @@ async function renderMcp() {
     toolCopy.textContent = tools.join(' · ') || 'Tool list unavailable';
     status.append(toolCopy);
     const hermesPlatform = integration.os === 'Windows' ? 'Windows' : integration.os === 'Linux' ? 'Linux' : 'local';
-    const hermes = setupCard('Hermes', `Register the ${hermesPlatform} launcher as your normal desktop user. AgentCall never edits your agent profile automatically.`, 'hermes');
+    const hermes = setupCard('Hermes', `Register the ${hermesPlatform} launcher as your normal desktop user. Arynox never edits your agent profile automatically.`, 'hermes');
     hermes.append(
-      commandRow('1. Register AgentCall', integration.hermesAdd),
+      commandRow('1. Register Arynox', integration.hermesAdd),
       commandRow('2. Verify connectivity', MCP_COMMANDS.hermes.test),
       commandRow('3. Review configured servers', MCP_COMMANDS.hermes.list),
     );
     const openclaw = setupCard('OpenClaw', 'Add the same local stdio server, then run OpenClaw’s built-in static and live connection checks.', 'openclaw');
     openclaw.append(
-      commandRow('1. Register AgentCall', integration.openclawAdd),
+      commandRow('1. Register Arynox', integration.openclawAdd),
       commandRow('2. Diagnose and probe', MCP_COMMANDS.openclaw.test),
       commandRow('3. Review MCP status', MCP_COMMANDS.openclaw.list),
     );
     const safety = setupCard('Local control boundary', 'MCP exposes only the documented call tools. USB access and device authentication remain owned by the local gateway service.');
     panel.append(status, hermes, openclaw, safety);
   } catch {
-    panel.querySelector('.panel-state').textContent = 'UNAVAILABLE · the local gateway must be reachable before Hermes or OpenClaw can use AgentCall';
+    panel.querySelector('.panel-state').textContent = 'UNAVAILABLE · the local gateway must be reachable before Hermes or OpenClaw can use Arynox';
     const commands = setupCard(`${integration?.os ?? 'Local'} MCP launcher`, 'Start the desktop gateway, then register the launcher shown for this operating system.');
     if (integration?.hermesAdd && integration?.openclawAdd) commands.append(
       commandRow('Register with Hermes', integration.hermesAdd),
@@ -457,7 +457,7 @@ function androidGuidance(device, gateway) {
   const setup = gateway?.setup ?? {};
   const reason = {
     usb_debugging_authorization_required: ['Approve USB debugging', 'Unlock the phone and approve the USB debugging prompt for this desktop.', 'info-text'],
-    phone_app_not_ready: ['Ready to pair', 'Open AgentCall on the phone and tap Connect desktop. If this phone is paired to another desktop profile, disconnect it and choose Forget paired desktop first.', 'info-text'],
+    phone_app_not_ready: ['Ready to pair', 'Open Arynox on the phone and tap Connect desktop. If this phone is paired to another desktop profile, disconnect it and choose Forget paired desktop first.', 'info-text'],
     multiple_phones_connected: ['Choose one phone', 'Disconnect other Android devices, leaving only the supported phone attached.', 'danger-text'],
     phone_offline: ['Phone offline', 'Unlock and reconnect the phone, then confirm USB debugging remains enabled.', 'danger-text'],
     usb_access_denied: ['USB access blocked', 'Reconnect the phone after installing the desktop package USB rules.', 'danger-text'],
@@ -471,7 +471,7 @@ function androidGuidance(device, gateway) {
   if (device?.phase === 'authorizing') return ['Authorizing', 'Unlock the phone and approve USB debugging if Android asks.', 'info-text'];
   if (gateway?.identity !== 'HARDWARE' || device?.qualification === 'unsupported' || gateway?.qualification === 'unsupported') return ['Unsupported device', 'Qualified hardware required before call controls can be enabled.', 'danger-text'];
   if (gateway?.state === 'stopped') return ['Disconnected', 'gatewayd is stopped. Inspect the installed service and logs before connecting a phone.', 'danger-text'];
-  return ['Waiting for phone', 'Connect the phone by USB, unlock it, then open AgentCall and tap Connect desktop.', 'info-text'];
+  return ['Waiting for phone', 'Connect the phone by USB, unlock it, then open Arynox and tap Connect desktop.', 'info-text'];
 }
 
 async function renderAndroid() {
@@ -508,10 +508,10 @@ async function renderAndroid() {
     addStatusRow(status, 'Speech runtime', speechState, gateway.realtime?.healthy || speechConfigured ? 'healthy-text' : 'info-text');
     const setup = setupCard('Phone setup checklist', 'Complete these steps once, then keep the phone connected while using call features.');
     const checklist = [
-      'Install the signed AgentCall APK and compatible device module from this release.',
-      'Set AgentCall as the default dialer when Android asks.',
+      'Install the signed Arynox APK and compatible device module from this release.',
+      'Set Arynox as the default dialer when Android asks.',
       'Connect the phone by USB and keep USB debugging authorized for this host.',
-      'Open AgentCall and tap Connect desktop; pairing completes automatically with no controller secret entry.',
+      'Open Arynox and tap Connect desktop; pairing completes automatically with no controller secret entry.',
       'Return here and require “Authenticated USB” before placing calls.',
     ];
     for (const [index, text] of checklist.entries()) {
@@ -1087,7 +1087,7 @@ async function renderSettings() {
 
   const receptionist = setupCard(
     'AI answers incoming calls',
-    'When enabled, AgentCall Desktop keeps Hermes ready to answer on your behalf. OpenClaw can use the same receptionist mode through the local MCP launcher. AgentCall passes these instructions, the saved contact name, and consented caller history to the agent.',
+    'When enabled, Arynox AI Call Assistant keeps Hermes ready to answer on your behalf. OpenClaw can use the same receptionist mode through the local MCP launcher. Arynox passes these instructions, the saved contact name, and consented caller history to the agent.',
   );
   receptionist.classList.add('receptionist-card');
   const modeRow = document.createElement('div');
@@ -1720,7 +1720,7 @@ async function renderRecordings() {
           audio.src = playback.mediaUrl;
           audio.hidden = false;
           await audio.play();
-          recordingFeedback('Playing inside AgentCall Desktop');
+          recordingFeedback('Playing inside Arynox AI Call Assistant');
         } catch {
           recordingFeedback('Playback failed · the recording remains available', true);
         } finally {
@@ -1751,7 +1751,7 @@ async function renderRecordings() {
       sync.disabled = !canSyncToPhone;
       sync.title = canSyncToPhone
         ? 'Copy this verified recording to the connected phone'
-        : 'Phone sync is available for recordings created by this AgentCall release';
+        : 'Phone sync is available for recordings created by this Arynox release';
       sync.addEventListener('click', async () => {
         if (!canSyncToPhone) return;
         sync.disabled = true;
