@@ -72,6 +72,10 @@
           "to": "gateway/scripts/hermes-voice-supervisor.js"
         },
         {
+          "from": "../scripts/ai-call.js",
+          "to": "gateway/scripts/ai-call.js"
+        },
+        {
           "from": "../package.json",
           "to": "gateway/package.json"
         },
